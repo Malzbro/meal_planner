@@ -31,3 +31,4 @@ Thumbs.db
 # Data artifacts (we'll regenerate these)
 data/raw/
 data/embeddings/
+data/
