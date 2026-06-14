@@ -1,5 +1,10 @@
+"""FastAPI application entry point."""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from api import routes_plan, routes_recipes, routes_swap
+
 
 app = FastAPI(
     title="Meal Planner API",
@@ -7,21 +12,25 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Allow the frontend (which will run on a different port) to talk to us
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite's default dev port
+    allow_origins=["http://localhost:5173"],  # Vite dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-@app.get("/")
+app.include_router(routes_plan.router)
+app.include_router(routes_recipes.router)
+app.include_router(routes_swap.router)
+
+
+@app.get("/", tags=["health"])
 def root():
     return {"status": "ok", "service": "meal-planner-api"}
 
 
-@app.get("/health")
+@app.get("/health", tags=["health"])
 def health():
     return {"status": "healthy"}
