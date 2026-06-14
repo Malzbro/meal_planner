@@ -59,53 +59,47 @@ def plan_week(session: Session, request: PlanRequest) -> PlanResponse:
         fit = fitness_score(recipe, request, relevance=relevance)
         scored.append((recipe, fit, relevance))
 
-    # Sort by fitness, descending.
-    scored.sort(key=lambda x: x[1], reverse=True)
-
-    # Step 3: greedy selection with diversity penalty.
-    selected: list[tuple[Recipe, float]] = []  # (recipe, relevance)
+    # Step 3: greedy selection with budget-pressure weighting.
+    # As budget gets tight, prefer cheaper meals more aggressively.
+    selected: list[tuple[Recipe, float]] = []
     used_cuisines: dict[str, int] = {}
     spent = 0.0
     warnings: list[str] = []
 
-    for recipe, fit, relevance in scored:
-        if len(selected) >= request.meals_per_week:
-            break
+    remaining_pool = list(scored)
 
-        meal_cost = _cost_for_household(recipe, request.household_size)
-        if spent + meal_cost > request.weekly_budget_gbp:
-            continue  # would blow the budget — skip
+    while len(selected) < request.meals_per_week and remaining_pool:
+        meals_remaining = request.meals_per_week - len(selected)
+        budget_remaining = request.weekly_budget_gbp - spent
+        target_per_meal = budget_remaining / meals_remaining if meals_remaining > 0 else 0
 
-        # Diversity penalty: if we already picked this cuisine, downrank it.
-        # We do this by *probabilistically* skipping repeats, not banning them.
-        cuisine_count = used_cuisines.get(recipe.cuisine, 0)
-        if cuisine_count > 0:
-            # Skip if a cheaper/better-fitting non-repeat exists later in the list.
-            has_alternative = any(
-                r.cuisine not in used_cuisines
-                and spent + _cost_for_household(r, request.household_size) <= request.weekly_budget_gbp
-                for r, _, _ in scored[scored.index((recipe, fit, relevance)) + 1 :][:20]
-            )
-            if has_alternative and cuisine_count >= 2:
-                continue
-
-        selected.append((recipe, relevance))
-        used_cuisines[recipe.cuisine] = cuisine_count + 1
-        spent += meal_cost
-
-    # Step 4: if under-filled, do a relaxed second pass ignoring diversity.
-    if len(selected) < request.meals_per_week:
-        selected_ids = {r.id for r, _ in selected}
-        for recipe, _, relevance in scored:
-            if len(selected) >= request.meals_per_week:
-                break
-            if recipe.id in selected_ids:
-                continue
+        # Rerank pool by *adjusted* fitness that penalises being over target_per_meal.
+        def adjusted_score(item):
+            recipe, fit, _ = item
             meal_cost = _cost_for_household(recipe, request.household_size)
-            if spent + meal_cost > request.weekly_budget_gbp:
-                continue
-            selected.append((recipe, relevance))
-            spent += meal_cost
+            # Penalty grows as cost exceeds the per-meal target.
+            cost_pressure = max(0.0, (meal_cost - target_per_meal) / max(target_per_meal, 1.0))
+            cuisine_pen = DIVERSITY_PENALTY * used_cuisines.get(recipe.cuisine, 0)
+            return fit - cost_pressure * 0.5 - cuisine_pen
+
+        remaining_pool.sort(key=adjusted_score, reverse=True)
+
+        # Pick the best candidate that actually fits the remaining budget.
+        picked_index = None
+        for i, (recipe, fit, relevance) in enumerate(remaining_pool):
+            meal_cost = _cost_for_household(recipe, request.household_size)
+            if spent + meal_cost <= request.weekly_budget_gbp:
+                picked_index = i
+                break
+
+        if picked_index is None:
+            break  # nothing left fits
+
+        recipe, _, relevance = remaining_pool.pop(picked_index)
+        meal_cost = _cost_for_household(recipe, request.household_size)
+        selected.append((recipe, relevance))
+        used_cuisines[recipe.cuisine] = used_cuisines.get(recipe.cuisine, 0) + 1
+        spent += meal_cost
 
     if len(selected) < request.meals_per_week:
         warnings.append(
@@ -113,7 +107,7 @@ def plan_week(session: Session, request: PlanRequest) -> PlanResponse:
             f"try increasing budget or relaxing filters."
         )
 
-    # Step 5: build response.
+    # Step 4: build response.
     meals = []
     for recipe, relevance in selected:
         meal_cost = _cost_for_household(recipe, request.household_size)
