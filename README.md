@@ -22,3 +22,10 @@ fallback to Groq's Llama 3.3 70B when free-tier rate limits are hit.
 Prices are LLM-estimated UK budget supermarket prices (Aldi/Lidl level),
 not live data. Calories are model-estimated, not lab-measured. Both are
 plausible enough for budget planning; neither is ground truth.
+
+## Scoring Function
+
+Developed a scoring function that score how close a recipe is to the plan 
+request. Based on Calories, Cost, Relevance, and Cuisine type. 
+The function uses weights, they help determine which are most important, 
+Calorie fit and relevance domniate out of the 4 choices. 
