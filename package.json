@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "tailwindcss-animate": "^1.0.7"
+  }
+}
