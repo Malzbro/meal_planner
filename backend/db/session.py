@@ -7,7 +7,10 @@ from sqlalchemy.orm import sessionmaker
 from db.models import Base
 
 
-DB_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "recipes.db"
+import os
+DATA_DIR = Path(os.getenv("DATA_DIR", str(Path(__file__).resolve().parent.parent.parent / "data")))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+DB_PATH = DATA_DIR / "recipes.db"
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 engine = create_engine(

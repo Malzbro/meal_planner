@@ -13,7 +13,10 @@ from rag.embedder import embed_texts
 from rag.embedding_text import recipe_to_embedding_text
 
 
-CHROMA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "chroma"
+import os
+_default_data = Path(__file__).resolve().parent.parent.parent / "data"
+DATA_DIR = Path(os.getenv("DATA_DIR", str(_default_data)))
+CHROMA_DIR = DATA_DIR / "chroma"
 COLLECTION_NAME = "recipes"
 
 

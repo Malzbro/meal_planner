@@ -7,7 +7,10 @@ from db.session import engine, SessionLocal, init_db
 from db.models import Recipe, Ingredient, Step, Tag, Appliance, Base
 
 
-JSONL_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "recipes.jsonl"
+import os
+_default_data = Path(__file__).resolve().parent.parent.parent / "data"
+DATA_DIR = Path(os.getenv("DATA_DIR", str(_default_data)))
+JSONL_PATH = DATA_DIR / "recipes.jsonl"
 
 
 def load() -> None:
