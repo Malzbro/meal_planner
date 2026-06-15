@@ -105,4 +105,29 @@ TEST_CASES: list[tuple[str, PlanRequest]] = [
     ("Low calorie target (300 kcal)",
      PlanRequest(weekly_budget_gbp=25, household_size=1, target_calories_per_serving=350,
                  preference_text="light meals")),
+
+    # Stress tests — deliberately designed to find the planner's limits
+
+    ("Stress: very tight calorie target with conflicting prefs",
+     PlanRequest(weekly_budget_gbp=25, household_size=1, target_calories_per_serving=400,
+                 preference_text="hearty filling meals")),
+
+    ("Stress: vegan + gluten-free + no oven + tight budget",
+     PlanRequest(weekly_budget_gbp=15, household_size=1, target_calories_per_serving=600,
+                 required_tags=["vegan", "gluten_free"], excluded_appliances=["oven"])),
+
+    ("Stress: high-protein + vegetarian (often conflicts in dataset)",
+     PlanRequest(weekly_budget_gbp=25, household_size=2, target_calories_per_serving=600,
+                 required_tags=["vegetarian", "high_protein"])),
+
+    ("Stress: very high calorie target",
+     PlanRequest(weekly_budget_gbp=30, household_size=1, target_calories_per_serving=1000,
+                 preference_text="big hearty filling meals")),
+
+    ("Stress: cuisine preference text vs strict tags",
+     PlanRequest(weekly_budget_gbp=20, household_size=1, target_calories_per_serving=600,
+                 required_tags=["vegan"], preference_text="hearty British comfort food with meat")),
+
+    ("Stress: family of 6 on very tight budget",
+     PlanRequest(weekly_budget_gbp=25, household_size=6, target_calories_per_serving=500)),
 ]
