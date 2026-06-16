@@ -1,6 +1,7 @@
 import type { PlanResponse, PlannedMeal } from "@/lib/api"
 import { gbp } from "@/lib/utils"
 import { useEffect, useState } from "react"
+import { useCountUp } from "@/lib/useCountUp"
 
 type Props = {
   plan: PlanResponse
@@ -17,6 +18,9 @@ export function PlanView({ plan, onSelectMeal, onReset }: Props) {
     }, 50)
     return () => clearTimeout(t)
   }, [plan.budget_utilization])
+  const animatedCost = useCountUp(plan.total_cost_gbp, 1000, 200)
+  const animatedCalories = useCountUp(plan.avg_calories_per_serving, 900, 300)
+  const animatedDiversity = useCountUp(plan.cuisine_diversity, 700, 400)
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
       <button onClick={onReset} className="text-sm text-muted hover:text-ink mb-8">
@@ -26,19 +30,18 @@ export function PlanView({ plan, onSelectMeal, onReset }: Props) {
       <div className="mb-10">
         <p className="text-xs uppercase tracking-widest text-muted mb-3">Your week</p>
         <h1 className="font-display text-4xl text-ink mb-2">
-          {plan.meals.length} meals, {gbp(plan.total_cost_gbp)} total
+          {plan.meals.length} meals, {gbp(animatedCost)} total
         </h1>
         <p className="text-muted">
-          {Math.round(plan.avg_calories_per_serving)} kcal average · {plan.cuisine_diversity} cuisines
+          {Math.round(animatedCalories)} kcal average · {Math.round(animatedDiversity)} cuisines
         </p>
       </div>
-
       {/* Signature element: the budget bar */}
       <div className="mb-12">
         <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2">
           <span>Budget allocated</span>
           <span className="font-mono">
-            {gbp(plan.total_cost_gbp)} / {gbp(plan.budget_gbp)}
+            {gbp(animatedCost)} / {gbp(plan.budget_gbp)}
           </span>
         </div>
         <div className="h-2 bg-chip rounded-sm overflow-hidden">

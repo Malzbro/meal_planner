@@ -28,7 +28,7 @@ export function StepShell({
   const progress = (step / totalSteps) * 100
 
   return (
-    <div className="max-w-xl mx-auto animate-in fade-in duration-300">
+    <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-right-2 duration-300">
       {/* Progress bar */}
       <div className="mb-12">
         <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2 font-mono">

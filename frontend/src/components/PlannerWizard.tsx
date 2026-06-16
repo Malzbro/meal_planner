@@ -22,18 +22,13 @@ export function PlannerWizard({ onSubmit, loading }: Props) {
 
   const submit = () => onSubmit(buildPlanRequest(state))
 
-  switch (state.step) {
-    case 1:
-      return <StepBudget state={state} update={update} onNext={next} />
-    case 2:
-      return <StepVibe state={state} update={update} onNext={next} onBack={back} />
-    case 3:
-      return <StepDietary state={state} update={update} onNext={next} onBack={back} />
-    case 4:
-      return <StepAppliances state={state} update={update} onNext={next} onBack={back} />
-    case 5:
-      return <StepFreeform state={state} update={update} onNext={submit} onBack={back} loading={loading} />
-    default:
-      return null
-  }
+return (
+    <div key={state.step}>
+      {state.step === 1 && <StepBudget state={state} update={update} onNext={next} />}
+      {state.step === 2 && <StepVibe state={state} update={update} onNext={next} onBack={back} />}
+      {state.step === 3 && <StepDietary state={state} update={update} onNext={next} onBack={back} />}
+      {state.step === 4 && <StepAppliances state={state} update={update} onNext={next} onBack={back} />}
+      {state.step === 5 && <StepFreeform state={state} update={update} onNext={submit} onBack={back} loading={loading} />}
+    </div>
+  )
 }

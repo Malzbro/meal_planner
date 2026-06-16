@@ -171,8 +171,8 @@ The goal of this phase is to convert the engineering work into actual interviews
 
 After studying a polished competitor app (similar concept, "Herbia"-style branding), the best ideas to port into Pantry's web frontend without copying the visual aesthetic:
 
-- [ ] **Multi-step onboarding flow** — replace the current single long form with 5–6 single-question screens (budget → vibe → dietary → appliances → preferences). Lower drop-off, more conversational, better mobile feel.
-- [ ] **"Vibe" abstraction** — human categories ("Quick & Easy," "Healthy Comfort," "Fakeaway") that internally translate to combinations of existing filters and preference text. Real users don't think in `high_protein` flags.
+- [x] **Multi-step onboarding flow** — replace the current single long form with 5–6 single-question screens (budget → vibe → dietary → appliances → preferences). Lower drop-off, more conversational, better mobile feel.
+- [x] **"Vibe" abstraction** — human categories ("Quick & Easy," "Healthy Comfort," "Fakeaway") that internally translate to combinations of existing filters and preference text. Real users don't think in `high_protein` flags.
 - [ ] **Plan reveal celebration moment** — a small animated "your week is sorted" beat when the plan generates. Tiny but creates an emotional payoff.
 - [ ] **Illustrated kitchen-appliances picker** — replace the text chips with a small illustrated kitchen scene. Warmer, more memorable.
 - [ ] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.

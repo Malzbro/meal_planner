@@ -4,6 +4,7 @@ import { PlanView } from "@/components/PlanView"
 import { PlanSkeleton } from "@/components/PlanSkeleton"
 import { RecipeModal } from "@/components/RecipeModal"
 import { createPlan, type PlanRequest, type PlanResponse, type PlannedMeal } from "@/lib/api"
+import { PlanReveal } from "@/components/PlanReveal"
 
 export default function App() {
   const [plan, setPlan] = useState<PlanResponse | null>(null)
@@ -11,6 +12,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null)
   const [lastRequest, setLastRequest] = useState<PlanRequest | null>(null)
+  const [showReveal, setShowReveal] = useState(false)
 
   const handleSubmit = async (req: PlanRequest) => {
     setLoading(true)
@@ -20,13 +22,13 @@ export default function App() {
     try {
       const result = await createPlan(req)
       setPlan(result)
+      setShowReveal(true)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong")
     } finally {
       setLoading(false)
     }
   }
-
   const handleSwapped = (mealIndex: number, newMeal: PlannedMeal) => {
     if (!plan) return
     const newMeals = [...plan.meals]
@@ -62,6 +64,8 @@ export default function App() {
           <PlanSkeleton />
         ) : !plan ? (
           <PlannerWizard onSubmit={handleSubmit} loading={loading} />
+        ) : showReveal ? (
+          <PlanReveal onComplete={() => setShowReveal(false)} />
         ) : (
           <PlanView
             plan={plan}
@@ -69,6 +73,7 @@ export default function App() {
             onReset={() => {
               setPlan(null)
               setLastRequest(null)
+              setShowReveal(false)
             }}
           />
         )}
