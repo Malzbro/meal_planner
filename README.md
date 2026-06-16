@@ -47,6 +47,8 @@ A few things I'd call attention to over the obvious "I used FastAPI" stuff:
 
 **Considered animation as a first-class design element.** The plan-reveal sequence (a drawn-SVG checkmark, then a "your week is sorted" beat, then the plan with budget cost and stats counting up from zero into their final values) is built with `requestAnimationFrame` and CSS stroke-dasharray drawing — not a heavyweight animation library. The intent is to make the computation feel earned: the user sees the numbers settle, which gives a visceral sense that something was solved on their behalf.
 
+**Hand-built data visualisations.** The plan view includes a cost breakdown bar (per-meal segments sized by spend) and a calorie distribution chart (bars per meal with a dashed target line, opacity scaled by distance from target). Built with raw SVG and CSS transitions — no chart library — because the dependency cost wasn't worth it for two visualisations and writing them by hand keeps the bundle small and the styling cohesive with the rest of the design system. The calorie distribution chart specifically anchors its y-axis scale around the user's requested calorie target — not the achieved average — so the dashed reference line sits centred and the user can immediately see whether the planner met their ask. This is honest design: the chart doesn't hide a miss by normalising to the result.
+
 ## Evaluation
 
 The planner is measured by an automated eval harness over 26 test cases covering budget range, dietary constraints, appliance exclusions, household sizes, and deliberately-hard stress cases (conflicting preferences, heavily-constrained candidate pools, edge calorie targets).

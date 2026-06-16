@@ -16,18 +16,25 @@ export function CalorieDistribution({ meals, target }: Props) {
   }, [])
 
   const values = meals.map(m => m.calories_per_serving)
-  const minValue = Math.min(...values)
+  const minValue = Math.min(...values, target)
   const maxValue = Math.max(...values, target)
-  // Use a floor that's some way below the lowest value so even the shortest bar
-  // has visible height variation. Round to a nice number.
-  const scaleMin = Math.max(0, Math.floor((minValue * 0.6) / 50) * 50)
-  const scaleMax = Math.ceil((maxValue * 1.15) / 100) * 100
+
+  // Center the scale around the target so the dashed line sits in the middle.
+  // The "spread" is the larger of (max-target) and (target-min), with some padding.
+  const upperSpread = maxValue - target
+  const lowerSpread = target - minValue
+  const halfRange = Math.max(upperSpread, lowerSpread) * 1.3 + 50
+
+  const scaleMin = Math.max(0, Math.floor((target - halfRange) / 50) * 50)
+  const scaleMax = Math.ceil((target + halfRange) / 50) * 50
   const range = scaleMax - scaleMin
   return (
     <div>
-      <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-3">
-        <span>Calories per serving</span>
-        <span className="font-mono">target {target} kcal</span>
+      <div className="flex justify-between items-baseline gap-3 text-xs uppercase tracking-widest text-muted mb-3 min-w-0">
+        <span className="flex-shrink-0">Calories per serving</span>
+        <span className="font-mono text-right">
+          avg {Math.round(meals.reduce((s, m) => s + m.calories_per_serving, 0) / meals.length)} · target {target}
+        </span>
       </div>
 
       <div className="relative h-32 flex items-end gap-2 px-1">
@@ -42,7 +49,7 @@ export function CalorieDistribution({ meals, target }: Props) {
             target
           </span>
         </div>
-        
+
         {meals.map((meal, i) => {
           const heightPct = animated? ((meal.calories_per_serving - scaleMin) / range) * 100: 0
           const deviation = Math.abs(meal.calories_per_serving - target) / target

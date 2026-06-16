@@ -7,11 +7,12 @@ import { CalorieDistribution } from "./CalorieDistribution"
 
 type Props = {
   plan: PlanResponse
+  calorieTarget: number
   onSelectMeal: (meal: PlannedMeal) => void
   onReset: () => void
 }
 
-export function PlanView({ plan, onSelectMeal, onReset }: Props) {
+export function PlanView({ plan, calorieTarget, onSelectMeal, onReset }: Props) {
   const [barWidth, setBarWidth] = useState(0)
 
   useEffect(() => {
@@ -68,7 +69,7 @@ export function PlanView({ plan, onSelectMeal, onReset }: Props) {
         <CostBreakdownBar meals={plan.meals} budget={plan.budget_gbp} />
         <CalorieDistribution
           meals={plan.meals}
-          target={Math.round(plan.avg_calories_per_serving)}
+          target={Math.round(calorieTarget)}
         />
       </div>
 
