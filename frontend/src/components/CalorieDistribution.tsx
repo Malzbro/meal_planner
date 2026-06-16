@@ -38,17 +38,26 @@ export function CalorieDistribution({ meals, target }: Props) {
       </div>
 
       <div className="relative h-32 flex items-end gap-2 px-1">
-        {/* Target line */}
-        {/* Target line */}
-        <div
-          className="absolute inset-x-0 z-10 pointer-events-none"
-          style={{ bottom: `${((target - scaleMin) / range) * 100}%` }}
-        >
-          <div className="border-t-2 border-dashed border-accent/70" />
-          <span className="absolute right-0 top-1 text-[10px] font-mono text-accent uppercase tracking-wider">
-            target
-          </span>
-        </div>
+        {/* Target line — label sits opposite the last (rightmost) bar to avoid overlap */}
+        {(() => {
+          const lastBar = meals[meals.length - 1]
+          const lastIsAboveTarget = lastBar.calories_per_serving > target
+          return (
+            <div
+              className="absolute inset-x-0 z-10 pointer-events-none"
+              style={{ bottom: `${((target - scaleMin) / range) * 100}%` }}
+            >
+              <div className="border-t-2 border-dashed border-accent/70" />
+              <span
+                className={`absolute right-0 text-[10px] font-mono text-accent uppercase tracking-wider ${
+                  lastIsAboveTarget ? "top-1" : "bottom-1"
+                }`}
+              >
+                target
+              </span>
+            </div>
+          )
+        })()}
 
         {meals.map((meal, i) => {
           const heightPct = animated? ((meal.calories_per_serving - scaleMin) / range) * 100: 0
