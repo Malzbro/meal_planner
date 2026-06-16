@@ -33,31 +33,21 @@ export function CalorieDistribution({ meals, target }: Props) {
       <div className="flex justify-between items-baseline gap-3 text-xs uppercase tracking-widest text-muted mb-3 min-w-0">
         <span className="flex-shrink-0">Calories per serving</span>
         <span className="font-mono text-right">
-          avg {Math.round(meals.reduce((s, m) => s + m.calories_per_serving, 0) / meals.length)} · target {target}
+          avg <span className="text-ink">{Math.round(meals.reduce((s, m) => s + m.calories_per_serving, 0) / meals.length)}</span>
+          {" · "}
+          <span className="text-accent inline-flex items-baseline gap-1">
+            <span className="inline-block w-3 h-0.5 border-t-2 border-dashed border-accent/70 self-center" />
+            target {target}
+          </span>
         </span>
       </div>
 
       <div className="relative h-32 flex items-end gap-2 px-1">
-        {/* Target line — label sits opposite the last (rightmost) bar to avoid overlap */}
-        {(() => {
-          const lastBar = meals[meals.length - 1]
-          const lastIsAboveTarget = lastBar.calories_per_serving > target
-          return (
-            <div
-              className="absolute inset-x-0 z-10 pointer-events-none"
-              style={{ bottom: `${((target - scaleMin) / range) * 100}%` }}
-            >
-              <div className="border-t-2 border-dashed border-accent/70" />
-              <span
-                className={`absolute right-0 text-[10px] font-mono text-accent uppercase tracking-wider ${
-                  lastIsAboveTarget ? "top-1" : "bottom-1"
-                }`}
-              >
-                target
-              </span>
-            </div>
-          )
-        })()}
+        {/* Target reference line — labeled in the chart header */}
+        <div
+          className="absolute inset-x-0 z-10 pointer-events-none border-t-2 border-dashed border-accent/70"
+          style={{ bottom: `${((target - scaleMin) / range) * 100}%` }}
+        />
 
         {meals.map((meal, i) => {
           const heightPct = animated? ((meal.calories_per_serving - scaleMin) / range) * 100: 0
