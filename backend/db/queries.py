@@ -48,3 +48,23 @@ def search_recipes(
 
 def count_recipes(session: Session) -> int:
     return session.query(Recipe).count()
+
+def filter_by_excluded_ingredients(
+    recipes: list[Recipe], excluded: list[str]
+) -> list[Recipe]:
+    """Filter out recipes whose ingredient list contains any excluded term.
+
+    Matches are substring-based (case-insensitive) so 'chicken' catches
+    'chicken breast', 'chicken stock', etc. This is intentional: if the user
+    says no chicken, they almost certainly mean no chicken stock either.
+    """
+    if not excluded:
+        return recipes
+
+    excluded_lower = [e.lower() for e in excluded]
+    filtered = []
+    for recipe in recipes:
+        ingredient_names = " ".join(i.name.lower() for i in recipe.ingredients)
+        if not any(term in ingredient_names for term in excluded_lower):
+            filtered.append(recipe)
+    return filtered

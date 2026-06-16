@@ -162,7 +162,7 @@ The goal of this phase is to convert the engineering work into actual interviews
 - [ ] Build LinkedIn profile from scratch
 - [x] Write a CV with Pantry as the centerpiece
 - [ ] Write and publish the LinkedIn launch post
-- [ ] Upload the full 373-recipe JSONL to Railway's persistent volume so the live demo matches the eval results
+- [x] Upload the full 373-recipe JSONL to Railway's persistent volume so the live demo matches the eval results
 - [x] Pin the GitHub repo on profile and add topics (`rag`, `llm`, `fastapi`, `react`, `python`, `ai-engineering`)
 - [ ] Add screenshot/short demo video to the README and LinkedIn post
 
