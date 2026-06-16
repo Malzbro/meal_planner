@@ -43,6 +43,8 @@ A few things I'd call attention to over the obvious "I used FastAPI" stuff:
 
 **Automated eval harness with 5 quality properties.** The system isn't just shipped on vibes — there's a `python -m evals.run` command that runs 26 test cases against the planner and reports pass rates per property. Hard constraints pass at 100%; the soft calorie target passes at 88%, with failures concentrated on dataset-bound and candidate-pool-bound edge cases (see Evaluation section below).
 
+**UX abstraction layer over the planning API.** The frontend translates human concepts ("Fakeaway", "Plant-Forward", "Budget Stretch" — vibe categories real users think in) into the technical filters the backend expects (`preferred_cuisines`, `required_tags`, `preference_text`). The vibe-to-filter mapping lives entirely on the client; the backend doesn't know vibes exist. This is the right boundary — it lets the UX evolve (renaming vibes, adding new ones, A/B-testing copy) without touching the API contract, and it keeps the backend a pure constraint-satisfaction service.
+
 ## Evaluation
 
 The planner is measured by an automated eval harness over 26 test cases covering budget range, dietary constraints, appliance exclusions, household sizes, and deliberately-hard stress cases (conflicting preferences, heavily-constrained candidate pools, edge calorie targets).
