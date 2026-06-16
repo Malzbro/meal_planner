@@ -27,9 +27,31 @@ def run(cmd: list[str], description: str) -> None:
 def main():
     print(f"[startup] DATA_DIR = {DATA_DIR}")
 
+    # ONE-TIME RESET: clear old artifacts so they rebuild from the new seed.
+    # Remove this block after the seed has been applied once.
+    RESET_ON_BOOT = os.getenv("RESET_DATA", "false").lower() == "true"
+    if RESET_ON_BOOT:
+        import shutil
+        print("[startup] RESET_DATA=true — wiping volume contents for fresh seed")
+        for path in [DATA_DIR / "recipes.jsonl", DATA_DIR / "recipes.db", DATA_DIR / "chroma"]:
+            if path.exists():
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()
+                print(f"[startup] Removed {path}")
+
+    SEED_JSONL = Path(__file__).parent / "seed" / "recipes.jsonl"
+
     if not JSONL.exists():
-        print("[startup] No recipes.jsonl found — generating dataset (this takes ~15 min)...")
-        run([sys.executable, "-m", "generator.run_all"], "Generate recipes")
+        if SEED_JSONL.exists():
+            print(f"[startup] Seeding recipes.jsonl from baked-in seed ({SEED_JSONL.stat().st_size} bytes)...")
+            import shutil
+            shutil.copy(SEED_JSONL, JSONL)
+            print(f"[startup] Seed copied to {JSONL}")
+        else:
+            print("[startup] No recipes.jsonl found — generating dataset (this takes ~15 min)...")
+            run([sys.executable, "-m", "generator.run_all"], "Generate recipes")
     else:
         print(f"[startup] Found existing recipes.jsonl ({JSONL.stat().st_size} bytes), skipping generation")
 
