@@ -74,8 +74,6 @@ Documented openly because pretending otherwise reads worse than the limitations 
 
 **Recipe prices and calories are LLM-estimated, not measured.** Prices reflect typical UK budget supermarket (Aldi/Lidl level) intuitions and are plausible but not real-time. Calories are model estimates, not lab-measured. For genuine nutritional or financial planning, real data sources would be needed.
 
-**The live demo uses a smaller dataset (93 recipes) than the eval (373 recipes).** Deploy-time generation hit free-tier rate limits and was cut short. The full 373-recipe JSONL is available locally and produces the eval results above. Uploading it to Railway's volume is a 15-minute task on the to-do list.
-
 **Backend cold starts on the free tier.** First request after inactivity takes ~15-25 seconds while Railway wakes the container. Subsequent requests are fast (sub-second for cached embedding queries).
 
 **Future work — beyond the negation fix:**
