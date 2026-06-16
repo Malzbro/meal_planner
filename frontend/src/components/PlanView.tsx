@@ -2,6 +2,8 @@ import type { PlanResponse, PlannedMeal } from "@/lib/api"
 import { gbp } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import { useCountUp } from "@/lib/useCountUp"
+import { CostBreakdownBar } from "./CostBreakdownBar"
+import { CalorieDistribution } from "./CalorieDistribution"
 
 type Props = {
   plan: PlanResponse
@@ -36,8 +38,8 @@ export function PlanView({ plan, onSelectMeal, onReset }: Props) {
           {Math.round(animatedCalories)} kcal average · {Math.round(animatedDiversity)} cuisines
         </p>
       </div>
-      {/* Signature element: the budget bar */}
-      <div className="mb-12">
+      {/* Top-level budget bar (overall utilization) */}
+      <div className="mb-10">
         <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2">
           <span>Budget allocated</span>
           <span className="font-mono">
@@ -49,8 +51,8 @@ export function PlanView({ plan, onSelectMeal, onReset }: Props) {
             className="h-full bg-accent transition-all ease-out"
             style={{
               width: `${barWidth}%`,
-              transitionDuration: "1500ms",
-              transitionDelay: "500ms",
+              transitionDuration: "1000ms",
+              transitionDelay: "200ms",
             }}
           />
         </div>
@@ -59,6 +61,15 @@ export function PlanView({ plan, onSelectMeal, onReset }: Props) {
           <span>{Math.round(plan.budget_utilization * 100)}% used</span>
           <span>{gbp(plan.budget_gbp)}</span>
         </div>
+      </div>
+
+      {/* Charts: cost breakdown + calorie distribution side-by-side on desktop, stacked on mobile */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <CostBreakdownBar meals={plan.meals} budget={plan.budget_gbp} />
+        <CalorieDistribution
+          meals={plan.meals}
+          target={Math.round(plan.avg_calories_per_serving)}
+        />
       </div>
 
       {plan.warnings.length > 0 && (
