@@ -178,6 +178,7 @@ After studying a polished competitor app (similar concept, "Herbia"-style brandi
 - [x] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.
 - [ ] **Confidence-aware messaging** — when hybrid_search returns low similarity scores across all candidates, surface that to the user instead of pretending the top result is great.
 - [ ] **Each of these is its own commit and potentially its own short LinkedIn post** — compounding visibility on the same project.
+- [ ] **Aggregated shopping list view** — sum ingredients across the week's recipes, scale by household size, group by ingredient category. The natural next user-facing feature (a meal plan is incomplete without a shopping list). Demonstrates data aggregation, unit normalisation, and a second API endpoint.
 
 ### Phase C — Mobile app *(2–4 weeks, after Phases A and B)*
 
