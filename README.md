@@ -33,7 +33,7 @@ The "what runs where" split is deliberate: arithmetic, constraints, and budget t
 
 A few things I'd call attention to over the obvious "I used FastAPI" stuff:
 
-**Provider abstraction with automatic fallback.** The generation pipeline uses a single `generate_json(prompt)` function that hides whether the call goes to Gemini or Groq. If Gemini hits its daily rate limit mid-run, the next call falls back to Groq's Llama 3.3 70B transparently. This is real production resilience pattern, not just "I called an API."
+**The provider abstraction** was extended with shape-aware unwrapping (object vs list expectation) so that fallback to a different LLM provider preserves the response contract — different providers wrap JSON differently, and the abstraction shouldn't leak those quirks to callers.
 
 **Schema-driven generation with validation.** Recipes aren't just dumped from the LLM — they're parsed into a Pydantic schema with constraints (cuisine must be one of N values, steps must be at least 10 characters, calories must be 0–3000, etc.). Anything that doesn't validate is dropped, not stored. This is how to use LLMs for structured data without ending up with garbage.
 

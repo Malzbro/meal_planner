@@ -142,8 +142,6 @@ These are the things worth highlighting in conversations, in order of impact:
 
 | Limitation | Why it matters | Plan |
 |---|---|---|
-| Negation in swap queries fails | "I don't want chicken" returns chicken recipes because embeddings encode aboutness, not logic | Phase B: structured constraint extraction via LLM |
-| Live demo uses 93 recipes, not 373 | Deploy-time generation hit rate limits and stopped early | Phase A: upload local JSONL to Railway volume |
 | Prices and calories are LLM-estimated | Plausible but not measured | Out of scope for V1; would require real grocery/nutrition APIs |
 | Backend cold-starts in 15–25 seconds | Free tier sleeps when idle | Document in README; acceptable for portfolio demo |
 | Halal (30) and low-carb (4) tags under-represented | Dataset bias from generation prompts | Phase B: targeted generation runs |
@@ -165,6 +163,9 @@ The goal of this phase is to convert the engineering work into actual interviews
 - [x] Upload the full 373-recipe JSONL to Railway's persistent volume so the live demo matches the eval results
 - [x] Pin the GitHub repo on profile and add topics (`rag`, `llm`, `fastapi`, `react`, `python`, `ai-engineering`)
 - [ ] Add screenshot/short demo video to the README and LinkedIn post
+
+- [x] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.
+- [x] **Provider abstraction shape-awareness** — extended `generate_json(prompt, expect=...)` so callers can declare whether they want an object or list response, making the Gemini→Groq fallback preserve response shape across both recipe generation (lists) and structured extraction (objects).
 
 ### Phase B — Polish web app with the best ideas from competing apps *(3–5 days, after Phase A)*
 

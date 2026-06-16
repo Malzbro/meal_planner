@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { PlannerForm } from "@/components/PlannerForm"
+import { PlannerWizard } from "@/components/PlannerWizard"
 import { PlanView } from "@/components/PlanView"
 import { PlanSkeleton } from "@/components/PlanSkeleton"
 import { RecipeModal } from "@/components/RecipeModal"
@@ -61,7 +61,7 @@ export default function App() {
         {loading ? (
           <PlanSkeleton />
         ) : !plan ? (
-          <PlannerForm onSubmit={handleSubmit} loading={loading} />
+          <PlannerWizard onSubmit={handleSubmit} loading={loading} />
         ) : (
           <PlanView
             plan={plan}
