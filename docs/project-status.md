@@ -173,9 +173,9 @@ After studying a polished competitor app (similar concept, "Herbia"-style brandi
 
 - [x] **Multi-step onboarding flow** — replace the current single long form with 5–6 single-question screens (budget → vibe → dietary → appliances → preferences). Lower drop-off, more conversational, better mobile feel.
 - [x] **"Vibe" abstraction** — human categories ("Quick & Easy," "Healthy Comfort," "Fakeaway") that internally translate to combinations of existing filters and preference text. Real users don't think in `high_protein` flags.
-- [ ] **Plan reveal celebration moment** — a small animated "your week is sorted" beat when the plan generates. Tiny but creates an emotional payoff.
+- [x] **Plan reveal celebration moment** — a small animated "your week is sorted" beat when the plan generates. Tiny but creates an emotional payoff.
 - [ ] **Illustrated kitchen-appliances picker** — replace the text chips with a small illustrated kitchen scene. Warmer, more memorable.
-- [ ] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.
+- [x] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.
 - [ ] **Confidence-aware messaging** — when hybrid_search returns low similarity scores across all candidates, surface that to the user instead of pretending the top result is great.
 - [ ] **Each of these is its own commit and potentially its own short LinkedIn post** — compounding visibility on the same project.
 

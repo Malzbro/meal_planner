@@ -1,3 +1,4 @@
+import "./step-shell.css"
 import type { ReactNode } from "react"
 
 type Props = {
@@ -28,7 +29,7 @@ export function StepShell({
   const progress = (step / totalSteps) * 100
 
   return (
-    <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-right-2 duration-300">
+    <div className="max-w-xl mx-auto step-content">
       {/* Progress bar */}
       <div className="mb-12">
         <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2 font-mono">
@@ -37,7 +38,7 @@ export function StepShell({
         </div>
         <div className="h-1 bg-chip rounded-sm overflow-hidden">
           <div
-            className="h-full bg-accent transition-all duration-500 ease-out"
+            className="h-full bg-accent transition-all duration-550 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>

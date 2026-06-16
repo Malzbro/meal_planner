@@ -1,0 +1,63 @@
+/* Default entrance: fade and slide from the right */
+.step-content {
+  animation: step-enter-forward 400ms ease-out both;
+}
+
+/* When the wrapper signals we're exiting forward, fade out to the left */
+[data-exiting="forward"] .step-content {
+  animation: step-exit-forward 250ms ease-in both;
+}
+
+/* When exiting back (user clicked Back), fade out to the right */
+[data-exiting="back"] .step-content {
+  animation: step-exit-back 250ms ease-in both;
+}
+
+/* When entering after a back action, slide from the left */
+[data-entering="back"] .step-content {
+  animation: step-enter-back 400ms ease-out both;
+}
+
+@keyframes step-enter-forward {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes step-enter-back {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes step-exit-forward {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+}
+
+@keyframes step-exit-back {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}

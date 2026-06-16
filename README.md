@@ -45,6 +45,8 @@ A few things I'd call attention to over the obvious "I used FastAPI" stuff:
 
 **UX abstraction layer over the planning API.** The frontend translates human concepts ("Fakeaway", "Plant-Forward", "Budget Stretch" — vibe categories real users think in) into the technical filters the backend expects (`preferred_cuisines`, `required_tags`, `preference_text`). The vibe-to-filter mapping lives entirely on the client; the backend doesn't know vibes exist. This is the right boundary — it lets the UX evolve (renaming vibes, adding new ones, A/B-testing copy) without touching the API contract, and it keeps the backend a pure constraint-satisfaction service.
 
+**Considered animation as a first-class design element.** The plan-reveal sequence (a drawn-SVG checkmark, then a "your week is sorted" beat, then the plan with budget cost and stats counting up from zero into their final values) is built with `requestAnimationFrame` and CSS stroke-dasharray drawing — not a heavyweight animation library. The intent is to make the computation feel earned: the user sees the numbers settle, which gives a visceral sense that something was solved on their behalf.
+
 ## Evaluation
 
 The planner is measured by an automated eval harness over 26 test cases covering budget range, dietary constraints, appliance exclusions, household sizes, and deliberately-hard stress cases (conflicting preferences, heavily-constrained candidate pools, edge calorie targets).
