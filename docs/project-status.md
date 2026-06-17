@@ -179,6 +179,7 @@ After studying a polished competitor app (similar concept, "Herbia"-style brandi
 - [ ] **Confidence-aware messaging** — when hybrid_search returns low similarity scores across all candidates, surface that to the user instead of pretending the top result is great.
 - [ ] **Each of these is its own commit and potentially its own short LinkedIn post** — compounding visibility on the same project.
 - [ ] **Aggregated shopping list view** — sum ingredients across the week's recipes, scale by household size, group by ingredient category. The natural next user-facing feature (a meal plan is incomplete without a shopping list). Demonstrates data aggregation, unit normalisation, and a second API endpoint.
+- [x] **Stochastic diversity in planner** — replaced deterministic top-pick with softmax-weighted sampling over top-N candidates. Eliminates the "same plan every time" failure mode while preserving hard constraints and overall plan quality.
 
 ### Phase C — Mobile app *(2–4 weeks, after Phases A and B)*
 

@@ -49,6 +49,8 @@ A few things I'd call attention to over the obvious "I used FastAPI" stuff:
 
 **Hand-built data visualisations.** The plan view includes a cost breakdown bar (per-meal segments sized by spend) and a calorie distribution chart (bars per meal with a dashed target line, opacity scaled by distance from target). Built with raw SVG and CSS transitions — no chart library — because the dependency cost wasn't worth it for two visualisations and writing them by hand keeps the bundle small and the styling cohesive with the rest of the design system. The calorie distribution chart specifically anchors its y-axis scale around the user's requested calorie target — not the achieved average — so the dashed reference line sits centred and the user can immediately see whether the planner met their ask. This is honest design: the chart doesn't hide a miss by normalising to the result.
 
+**Stochastic diversity via softmax-weighted sampling.** The planner's greedy selection was originally deterministic — for a given input, the top-scoring candidates would always win, leading to identical plans on identical requests (the "same Toad in the Hole every time" failure mode). Fixed by replacing the deterministic top-pick with temperature-weighted softmax sampling over the top N candidates: high-fitness recipes still win most of the time, but real variation emerges across runs. Hard constraints remain fully deterministic — only the "which good option to choose" step is stochastic.
+
 ## Evaluation
 
 The planner is measured by an automated eval harness over 26 test cases covering budget range, dietary constraints, appliance exclusions, household sizes, and deliberately-hard stress cases (conflicting preferences, heavily-constrained candidate pools, edge calorie targets).
