@@ -70,6 +70,7 @@ export default function App() {
           <PlanView
             plan={plan}
             calorieTarget={lastRequest?.target_calories_per_serving ?? plan.avg_calories_per_serving}
+            householdSize={lastRequest?.household_size ?? 1}
             onSelectMeal={(m: PlannedMeal) => setSelectedRecipeId(m.recipe_id)}
             onReset={() => {
               setPlan(null)

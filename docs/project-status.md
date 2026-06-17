@@ -145,24 +145,25 @@ These are the things worth highlighting in conversations, in order of impact:
 | Prices and calories are LLM-estimated | Plausible but not measured | Out of scope for V1; would require real grocery/nutrition APIs |
 | Backend cold-starts in 15–25 seconds | Free tier sleeps when idle | Document in README; acceptable for portfolio demo |
 | Halal (30) and low-carb (4) tags under-represented | Dataset bias from generation prompts | Phase B: targeted generation runs |
+| Recipes store all quantities in grams, including liquids | The dataset was generated with a single `grams` field per ingredient; liquids like oil and stock are stored as grams (close to ml but not unit-honest). Shopping list compensates by displaying known liquids as ml on the frontend, but the underlying data is technically incorrect. Pricing also treats some liquid quantities as if they were solid weights. | Future: regenerate dataset with `unit: g \| ml \| tbsp \| tsp \| whole` field per ingredient; update pricing prompts; add unit-aware aggregation logic. ~4-6 hours of work. |
 
 ---
 
 ## Roadmap (Phased)
 
-### Phase A — Land Pantry properly *(in progress, ~1 week)*
+### Phase A — Land Pantry properly *(done, ~1 week)*
 
 The goal of this phase is to convert the engineering work into actual interviews. Most of the high-leverage work here is *presentation*, not code.
 
 - [x] Build and deploy V1 end-to-end (frontend + backend, live URL)
 - [x] Write a comprehensive README with architecture diagram and evaluation results
 - [x] Document known limitations honestly
-- [ ] Build LinkedIn profile from scratch
+- [x] Build LinkedIn profile from scratch
 - [x] Write a CV with Pantry as the centerpiece
-- [ ] Write and publish the LinkedIn launch post
+- [x] Write and publish the LinkedIn launch post
 - [x] Upload the full 373-recipe JSONL to Railway's persistent volume so the live demo matches the eval results
 - [x] Pin the GitHub repo on profile and add topics (`rag`, `llm`, `fastapi`, `react`, `python`, `ai-engineering`)
-- [ ] Add screenshot/short demo video to the README and LinkedIn post
+- [x] Add screenshot/short demo video to the README and LinkedIn post
 
 - [x] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.
 - [x] **Provider abstraction shape-awareness** — extended `generate_json(prompt, expect=...)` so callers can declare whether they want an object or list response, making the Gemini→Groq fallback preserve response shape across both recipe generation (lists) and structured extraction (objects).
@@ -178,8 +179,9 @@ After studying a polished competitor app (similar concept, "Herbia"-style brandi
 - [x] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.
 - [ ] **Confidence-aware messaging** — when hybrid_search returns low similarity scores across all candidates, surface that to the user instead of pretending the top result is great.
 - [ ] **Each of these is its own commit and potentially its own short LinkedIn post** — compounding visibility on the same project.
-- [ ] **Aggregated shopping list view** — sum ingredients across the week's recipes, scale by household size, group by ingredient category. The natural next user-facing feature (a meal plan is incomplete without a shopping list). Demonstrates data aggregation, unit normalisation, and a second API endpoint.
+- [x] **Aggregated shopping list view** — sum ingredients across the week's recipes, scale by household size, group by ingredient category. The natural next user-facing feature (a meal plan is incomplete without a shopping list). Demonstrates data aggregation, unit normalisation, and a second API endpoint.
 - [x] **Stochastic diversity in planner** — replaced deterministic top-pick with softmax-weighted sampling over top-N candidates. Eliminates the "same plan every time" failure mode while preserving hard constraints and overall plan quality.
+- [ ]**Unit-aware recipe schema and aggregation** — current schema stores all quantities in grams, leading to weight units being applied to liquids. A `unit` field per ingredient and corresponding aggregation logic would make the data unit-honest and unlock more accurate pricing.
 
 ### Phase C — Mobile app *(2–4 weeks, after Phases A and B)*
 
@@ -192,7 +194,17 @@ Once the web version is fully landed and a couple of cycles of feedback have bee
 - [ ] Take the lessons from Phase B's polished web app and apply them with mobile-native conventions
 
 
+## User-Discovered Issues (V2 candidates)
+
+Issues found through dogfooding the app, prioritised but deferred for batched future work:
+
+- **Stochastic diversity** — fixed (June 2026): planner was deterministic, producing identical plans for identical inputs. Replaced with softmax-weighted sampling.
+- **Negation in swap queries** — fixed (June 2026): "no chicken" was treated as semantically similar to chicken. Added LLM-driven structured extraction.
+- **Unit unawareness for liquids** — open: ingredient quantities are all in grams; liquids should be ml. Frontend display workaround in place.
+- **Pantry-staple noise in shopping lists** — fixed (June 2026): water/salt/pepper were appearing on shopping lists; added a staple-name filter.
+
 ### Beyond — Other portfolio projects
+
 
 After Pantry has done its job, the natural next moves depend on which role types are showing interest:
 

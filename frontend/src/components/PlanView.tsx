@@ -4,16 +4,19 @@ import { useEffect, useState } from "react"
 import { useCountUp } from "@/lib/useCountUp"
 import { CostBreakdownBar } from "./CostBreakdownBar"
 import { CalorieDistribution } from "./CalorieDistribution"
+import { ShoppingListView } from "./ShoppingList"
 
 type Props = {
   plan: PlanResponse
   calorieTarget: number
+  householdSize: number
   onSelectMeal: (meal: PlannedMeal) => void
   onReset: () => void
 }
 
-export function PlanView({ plan, calorieTarget, onSelectMeal, onReset }: Props) {
+export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onReset }: Props) {
   const [barWidth, setBarWidth] = useState(0)
+  const [tab, setTab] = useState<"plan" | "shopping">("plan")
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -26,19 +29,41 @@ export function PlanView({ plan, calorieTarget, onSelectMeal, onReset }: Props) 
   const animatedDiversity = useCountUp(plan.cuisine_diversity, 700, 400)
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
-      <button onClick={onReset} className="text-sm text-muted hover:text-ink mb-8">
-        ← Start over
-      </button>
-
-      <div className="mb-10">
-        <p className="text-xs uppercase tracking-widest text-muted mb-3">Your week</p>
-        <h1 className="font-display text-4xl text-ink mb-2">
-          {plan.meals.length} meals, {gbp(animatedCost)} total
-        </h1>
-        <p className="text-muted">
-          {Math.round(animatedCalories)} kcal average · {Math.round(animatedDiversity)} cuisines
-        </p>
+      <div className="flex items-center justify-between mb-8">
+        <button onClick={onReset} className="text-sm text-muted hover:text-ink transition-colors">
+          ← Start over
+        </button>
+        <div className="flex gap-1 bg-chip rounded-md p-1">
+          <button
+            onClick={() => setTab("plan")}
+            className={`px-3 py-1.5 rounded text-xs uppercase tracking-widest transition-colors ${
+              tab === "plan" ? "bg-bg text-ink shadow-sm" : "text-muted hover:text-ink"
+            }`}
+          >
+            Plan
+          </button>
+          <button
+            onClick={() => setTab("shopping")}
+            className={`px-3 py-1.5 rounded text-xs uppercase tracking-widest transition-colors ${
+              tab === "shopping" ? "bg-bg text-ink shadow-sm" : "text-muted hover:text-ink"
+            }`}
+          >
+            Shopping list
+          </button>
+        </div>
       </div>
+
+      {tab === "plan" ? (
+        <>
+          {/* everything that was in the plan view before — the "Your week" heading,
+              budget bar, charts grid, meal cards grid */}
+        </>
+      ) : (
+        <ShoppingListView
+          recipeIds={plan.meals.map(m => m.recipe_id)}
+          householdSize={householdSize}
+        />
+      )}
       {/* Top-level budget bar (overall utilization) */}
       <div className="mb-10">
         <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2">

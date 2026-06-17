@@ -46,6 +46,24 @@ export type RecipeDetail = {
   steps: { position: number; content: string }[]
 }
 
+export type ShoppingItem = {
+  name: string
+  grams: number
+  estimated_cost_gbp: number
+  appears_in: string[]
+}
+
+export type ShoppingCategory = {
+  name: string
+  items: ShoppingItem[]
+}
+
+export type ShoppingList = {
+  categories: ShoppingCategory[]
+  total_ingredients: number
+  estimated_total_cost_gbp: number
+}
+
 export async function createPlan(req: PlanRequest): Promise<PlanResponse> {
   const r = await fetch(`${BASE_URL}/plan`, {
     method: "POST",
@@ -73,5 +91,18 @@ export async function swapMeal(args: {
     body: JSON.stringify(args),
   })
   if (!r.ok) throw new Error(`Swap failed: ${r.status}`)
+  return r.json()
+}
+
+export async function getShoppingList(args: {
+  recipe_ids: number[]
+  household_size: number
+}): Promise<ShoppingList> {
+  const r = await fetch(`${BASE_URL}/shopping-list`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(args),
+  })
+  if (!r.ok) throw new Error(`Shopping list failed: ${r.status}`)
   return r.json()
 }

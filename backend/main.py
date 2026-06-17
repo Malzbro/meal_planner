@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api import routes_plan, routes_recipes, routes_swap
+from api import routes_plan, routes_recipes, routes_swap, routes_shopping
 
 
 app = FastAPI(
@@ -27,6 +27,7 @@ app.add_middleware(
 app.include_router(routes_plan.router)
 app.include_router(routes_recipes.router)
 app.include_router(routes_swap.router)
+app.include_router(routes_shopping.router)
 
 
 @app.get("/", tags=["health"])
