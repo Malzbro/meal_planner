@@ -25,8 +25,6 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
     return () => clearTimeout(t)
   }, [plan.budget_utilization])
   const animatedCost = useCountUp(plan.total_cost_gbp, 1000, 200)
-  //const animatedCalories = useCountUp(plan.avg_calories_per_serving, 900, 300)
-  //const animatedDiversity = useCountUp(plan.cuisine_diversity, 700, 400)
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-8">
