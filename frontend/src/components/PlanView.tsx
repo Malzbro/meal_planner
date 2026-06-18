@@ -14,87 +14,153 @@ type Props = {
   onReset: () => void
 }
 
-export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onReset }: Props) {
-  const [barWidth, setBarWidth] = useState(0)
-  const [tab, setTab] = useState<"plan" | "shopping">("plan")
+type ActiveCard = "budget" | "shopping" | "stats" | null
 
+export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onReset }: Props) {
+  const [active, setActive] = useState<ActiveCard>(null)
+  const [barWidth, setBarWidth] = useState(0)
+
+  // Animate budget bar only when its panel is opened (was on mount before).
   useEffect(() => {
+    if (active !== "budget") {
+      setBarWidth(0)
+      return
+    }
     const t = setTimeout(() => {
       setBarWidth(Math.min(100, plan.budget_utilization * 100))
     }, 50)
     return () => clearTimeout(t)
-  }, [plan.budget_utilization])
+  }, [plan.budget_utilization, active])
+
   const animatedCost = useCountUp(plan.total_cost_gbp, 1000, 200)
+  const pct = Math.round(plan.budget_utilization * 100)
+
+  const cuisineCounts = plan.meals.reduce<Record<string, number>>((acc, m) => {
+    acc[m.cuisine] = (acc[m.cuisine] ?? 0) + 1
+    return acc
+  }, {})
+  const cuisineBreakdown = Object.entries(cuisineCounts)
+    .sort(([, a], [, b]) => b - a)
+    .map(([c, n]) => `${c} × ${n}`)
+    .join(", ")
+
+  const cardBase = "text-left p-5 border rounded-lg bg-bg transition-colors"
+  const activeBorder = "border-accent"
+  const inactiveBorder = "border-line hover:border-ink"
+  const mutedCard = "border-line opacity-60 cursor-not-allowed"
+  const eyebrow = "text-xs uppercase tracking-widest text-muted"
+
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <button onClick={onReset} className="text-sm text-muted hover:text-ink transition-colors">
           ← Start over
         </button>
-        <div className="flex gap-1 bg-chip rounded-md p-1">
-          <button
-            onClick={() => setTab("plan")}
-            className={`px-3 py-1.5 rounded text-xs uppercase tracking-widest transition-colors ${
-              tab === "plan" ? "bg-bg text-ink shadow-sm" : "text-muted hover:text-ink"
-            }`}
-          >
-            Plan
-          </button>
-          <button
-            onClick={() => setTab("shopping")}
-            className={`px-3 py-1.5 rounded text-xs uppercase tracking-widest transition-colors ${
-              tab === "shopping" ? "bg-bg text-ink shadow-sm" : "text-muted hover:text-ink"
-            }`}
-          >
-            Shopping list
-          </button>
-        </div>
       </div>
 
-      {tab === "plan" ? (
-        <>
-          {/* everything that was in the plan view before — the "Your week" heading,
-              budget bar, charts grid, meal cards grid */}
-        </>
-      ) : (
-        <ShoppingListView
-          recipeIds={plan.meals.map(m => m.recipe_id)}
-          householdSize={householdSize}
-        />
+      <div className="mb-6">
+        <h2 className="font-display text-2xl text-ink">
+          Your week — {plan.meals.length} meals,{" "}
+          <span className="font-mono">{gbp(animatedCost)}</span> total
+        </h2>
+      </div>
+
+      {/* 2x2 dashboard */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <button
+          onClick={() => setActive(active === "budget" ? null : "budget")}
+          className={`${cardBase} ${active === "budget" ? activeBorder : inactiveBorder}`}
+        >
+          <p className={eyebrow}>Budget</p>
+          <p className="font-mono text-lg text-ink mt-2">
+            {gbp(plan.total_cost_gbp)} <span className="text-muted">of</span> {gbp(plan.budget_gbp)}
+          </p>
+          <p className="text-sm text-muted mt-1">{pct}% allocated</p>
+          <div className="h-1 bg-chip rounded-sm overflow-hidden mt-3">
+            <div className="h-full bg-accent" style={{ width: `${Math.min(100, pct)}%` }} />
+          </div>
+        </button>
+
+        <button
+          onClick={() => setActive(active === "shopping" ? null : "shopping")}
+          className={`${cardBase} ${active === "shopping" ? activeBorder : inactiveBorder}`}
+        >
+          <p className={eyebrow}>Shopping list</p>
+          <p className="font-mono text-lg text-ink mt-2">{plan.meals.length} recipes</p>
+          <p className="text-sm text-muted mt-1">Tap to view ingredients</p>
+        </button>
+
+        <div className={`${cardBase} ${mutedCard}`} aria-disabled="true">
+          <p className={eyebrow}>Pantry</p>
+          <p className="font-mono text-lg text-muted mt-2">Coming soon</p>
+          <p className="text-sm text-muted mt-1">Track what you already have</p>
+        </div>
+
+        <button
+          onClick={() => setActive(active === "stats" ? null : "stats")}
+          className={`${cardBase} ${active === "stats" ? activeBorder : inactiveBorder}`}
+        >
+          <p className={eyebrow}>Stats</p>
+          <p className="font-mono text-lg text-ink mt-2">
+            {Math.round(plan.avg_calories_per_serving)} kcal avg
+          </p>
+          <p className="text-sm text-muted mt-1">{plan.cuisine_diversity} cuisines</p>
+        </button>
+      </div>
+
+      {/* Expanded panel — keyed on `active` so switching re-runs the animate-in */}
+      {active && (
+        <div
+          key={active}
+          className="mb-10 p-6 border border-line rounded-lg bg-bg animate-in fade-in slide-in-from-top-2 duration-300"
+        >
+          {active === "budget" && (
+            <>
+              <div className="mb-6">
+                <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2">
+                  <span>Budget allocated</span>
+                  <span className="font-mono">
+                    {gbp(plan.total_cost_gbp)} / {gbp(plan.budget_gbp)}
+                  </span>
+                </div>
+                <div className="h-2 bg-chip rounded-sm overflow-hidden">
+                  <div
+                    className="h-full bg-accent transition-all ease-out"
+                    style={{
+                      width: `${barWidth}%`,
+                      transitionDuration: "1000ms",
+                      transitionDelay: "200ms",
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-muted mt-2 font-mono">
+                  <span>£0</span>
+                  <span>{pct}% used</span>
+                  <span>{gbp(plan.budget_gbp)}</span>
+                </div>
+              </div>
+              <CostBreakdownBar meals={plan.meals} budget={plan.budget_gbp} />
+            </>
+          )}
+
+          {active === "shopping" && (
+            <ShoppingListView
+              recipeIds={plan.meals.map(m => m.recipe_id)}
+              householdSize={householdSize}
+            />
+          )}
+
+          {active === "stats" && (
+            <div className="space-y-6">
+              <CalorieDistribution meals={plan.meals} target={Math.round(calorieTarget)} />
+              <div>
+                <p className={`${eyebrow} mb-2`}>Cuisine breakdown</p>
+                <p className="text-sm text-ink">{cuisineBreakdown}</p>
+              </div>
+            </div>
+          )}
+        </div>
       )}
-      {/* Top-level budget bar (overall utilization) */}
-      <div className="mb-10">
-        <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2">
-          <span>Budget allocated</span>
-          <span className="font-mono">
-            {gbp(animatedCost)} / {gbp(plan.budget_gbp)}
-          </span>
-        </div>
-        <div className="h-2 bg-chip rounded-sm overflow-hidden">
-          <div
-            className="h-full bg-accent transition-all ease-out"
-            style={{
-              width: `${barWidth}%`,
-              transitionDuration: "1000ms",
-              transitionDelay: "200ms",
-            }}
-          />
-        </div>
-        <div className="flex justify-between text-xs text-muted mt-2 font-mono">
-          <span>£0</span>
-          <span>{Math.round(plan.budget_utilization * 100)}% used</span>
-          <span>{gbp(plan.budget_gbp)}</span>
-        </div>
-      </div>
-
-      {/* Charts: cost breakdown + calorie distribution side-by-side on desktop, stacked on mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <CostBreakdownBar meals={plan.meals} budget={plan.budget_gbp} />
-        <CalorieDistribution
-          meals={plan.meals}
-          target={Math.round(calorieTarget)}
-        />
-      </div>
 
       {plan.warnings.length > 0 && (
         <div className="mb-8 p-4 border border-line rounded-md bg-chip">
@@ -103,6 +169,8 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
           ))}
         </div>
       )}
+
+      <hr className="border-line mb-8" />
 
       <div className="grid sm:grid-cols-2 gap-4">
         {plan.meals.map((meal, i) => (

@@ -192,6 +192,11 @@ Once the web version is fully landed and a couple of cycles of feedback have bee
 - [ ] Mobile-native patterns: bottom tab navigation, native gestures, haptic feedback on key actions
 - [ ] Skip the App Store for V1 — Expo preview build + screenshots + 30-second demo video is sufficient for portfolio purposes
 - [ ] Take the lessons from Phase B's polished web app and apply them with mobile-native conventions
+- [ ] Pantry feature (Phase C candidate) — user marks ingredients they
+  already have; shopping list automatically filters those out. Persists
+  in localStorage initially, would be account-bound when auth is added.
+  Demonstrates state synchronization between two views and is the
+  natural "next user-facing feature" after shopping list.
 
 
 ## User-Discovered Issues (V2 candidates)
@@ -212,6 +217,7 @@ After Pantry has done its job, the natural next moves depend on which role types
 - **If full-stack with AI interest is strong** — a SaaS-shaped project (multi-tenant, auth, billing) using LLMs as a feature rather than the centerpiece.
 - **If the EE background is still relevant** — something that bridges hardware and AI: edge ML on a Raspberry Pi, real-time signal processing with a model, or sensor data analysis.
 
+## Future Potential Ideas
 
 
 ---
