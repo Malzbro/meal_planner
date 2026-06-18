@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { StepShell } from "./StepShell"
 import type { WizardState } from "@/lib/vibes"
 
@@ -13,6 +13,18 @@ type Props = {
 export function StepFreeform({ state, update, onNext, onBack, loading }: Props) {
   const [showAdvanced, setShowAdvanced] = useState(false)
 
+  const [coldStartLabel, setColdStartLabel] = useState<string>("Planning your week...")
+
+  useEffect(() => {
+    if (!loading) {
+      setColdStartLabel("Planning your week...")
+      return
+    }
+    const t1 = setTimeout(() => setColdStartLabel("Waking up the service..."), 5000)
+    const t2 = setTimeout(() => setColdStartLabel("Almost there..."), 12000)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [loading])
+
   return (
     <StepShell
       step={5}
@@ -22,7 +34,7 @@ export function StepFreeform({ state, update, onNext, onBack, loading }: Props) 
       subtitle="Add any specifics in your own words. Or just plan the week."
       onNext={onNext}
       onBack={onBack}
-      nextLabel={loading ? "Planning your week..." : "Plan my week"}
+      nextLabel={loading ? coldStartLabel : "Plan my week"}
       canAdvance={!loading}
     >
       <div className="space-y-8">
