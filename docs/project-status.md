@@ -175,13 +175,14 @@ After studying a polished competitor app (similar concept, "Herbia"-style brandi
 - [x] **Multi-step onboarding flow** — replace the current single long form with 5–6 single-question screens (budget → vibe → dietary → appliances → preferences). Lower drop-off, more conversational, better mobile feel.
 - [x] **"Vibe" abstraction** — human categories ("Quick & Easy," "Healthy Comfort," "Fakeaway") that internally translate to combinations of existing filters and preference text. Real users don't think in `high_protein` flags.
 - [x] **Plan reveal celebration moment** — a small animated "your week is sorted" beat when the plan generates. Tiny but creates an emotional payoff.
-- [ ] **Illustrated kitchen-appliances picker** — replace the text chips with a small illustrated kitchen scene. Warmer, more memorable.
+- [x] **Illustrated kitchen-appliances picker** — replace the text chips with a small illustrated kitchen scene. Warmer, more memorable.
 - [x] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.
 - [ ] **Confidence-aware messaging** — when hybrid_search returns low similarity scores across all candidates, surface that to the user instead of pretending the top result is great.
 - [ ] **Each of these is its own commit and potentially its own short LinkedIn post** — compounding visibility on the same project.
 - [x] **Aggregated shopping list view** — sum ingredients across the week's recipes, scale by household size, group by ingredient category. The natural next user-facing feature (a meal plan is incomplete without a shopping list). Demonstrates data aggregation, unit normalisation, and a second API endpoint.
 - [x] **Stochastic diversity in planner** — replaced deterministic top-pick with softmax-weighted sampling over top-N candidates. Eliminates the "same plan every time" failure mode while preserving hard constraints and overall plan quality.
-- [ ]**Unit-aware recipe schema and aggregation** — current schema stores all quantities in grams, leading to weight units being applied to liquids. A `unit` field per ingredient and corresponding aggregation logic would make the data unit-honest and unlock more accurate pricing.
+- [x]**Unit-aware recipe schema and aggregation** — current schema stores all quantities in grams, leading to weight units being applied to liquids. A `unit` field per ingredient and corresponding aggregation logic would make the data unit-honest and unlock more accurate pricing.
+- [x] **Illustrated kitchen-appliances picker** — V1 shipped (icons on a counter scene). V2 refinement deferred: integrate icons into the background scene and add a pop-out animation on selection so picking feels physical.
 
 ### Phase C — Mobile app *(2–4 weeks, after Phases A and B)*
 
@@ -207,6 +208,7 @@ Issues found through dogfooding the app, prioritised but deferred for batched fu
 - **Negation in swap queries** — fixed (June 2026): "no chicken" was treated as semantically similar to chicken. Added LLM-driven structured extraction.
 - **Unit unawareness for liquids** — open: ingredient quantities are all in grams; liquids should be ml. Frontend display workaround in place.
 - **Pantry-staple noise in shopping lists** — fixed (June 2026): water/salt/pepper were appearing on shopping lists; added a staple-name filter.
+- **Illustrated kitchen-appliances picker — refinement deferred:** initial implementation ships icons on a counter scene; the appliances feel slightly disconnected from the background. Planned V2: integrate appliances into the background as part of a single composed illustration, with a subtle "pop-out" / lift animation on selection so picking one feels physical rather than a state toggle.
 
 ### Beyond — Other portfolio projects
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Leaf } from "./Leaf"
 
 type Props = {
   onComplete: () => void
@@ -25,8 +26,9 @@ export function PlanReveal({ onComplete }: Props) {
         <p className="text-xs uppercase tracking-widest text-muted mb-3 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-150 fill-mode-both">
           Your week is sorted
         </p>
-        <h2 className="font-display text-3xl text-ink animate-in fade-in slide-in-from-bottom-2 duration-500 delay-300 fill-mode-both">
-          7 meals, planned.
+        <h2 className="font-display text-4xl text-ink flex items-center gap-3 justify-center">
+          <Leaf className="text-accent" size={20} />
+          <span>Your week is sorted</span>
         </h2>
       </div>
     </div>

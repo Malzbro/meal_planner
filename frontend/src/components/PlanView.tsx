@@ -5,6 +5,7 @@ import { useCountUp } from "@/lib/useCountUp"
 import { CostBreakdownBar } from "./CostBreakdownBar"
 import { CalorieDistribution } from "./CalorieDistribution"
 import { ShoppingListView } from "./ShoppingList"
+import { Leaf } from "./Leaf"
 
 type Props = {
   plan: PlanResponse

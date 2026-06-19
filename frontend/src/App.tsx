@@ -5,6 +5,7 @@ import { PlanSkeleton } from "@/components/PlanSkeleton"
 import { RecipeModal } from "@/components/RecipeModal"
 import { createPlan, type PlanRequest, type PlanResponse, type PlannedMeal } from "@/lib/api"
 import { PlanReveal } from "@/components/PlanReveal"
+import { Leaf } from "@/components/Leaf"
 
 export default function App() {
   const [plan, setPlan] = useState<PlanResponse | null>(null)
@@ -48,7 +49,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-bg">
       <header className="border-b border-line">
-        <div className="container py-4">
+        <div className="container py-4 flex items-center gap-2">
+          <Leaf className="text-accent" size={14} />
           <p className="font-display text-lg text-ink">Pantry</p>
         </div>
       </header>
