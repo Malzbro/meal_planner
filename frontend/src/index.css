@@ -4,6 +4,36 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap');
 
+:root {
+  --bg: #FAFAF8;
+  --ink: #0F0F10;
+  --muted: #6F6F73;
+  --line: #E8E5DE;
+  --accent: #6B2737;
+  --accent-fg: #FAFAF8;
+  --chip: #F1EDE5;
+  --card-border: #D9D3C7;
+  --card-border-hover: #B0A893;
+}
+
+:root.dark {
+  --bg: #1A1816;
+  --ink: #F0EDE6;
+  --muted: #8C8780;
+  --line: #2E2A26;
+  --accent: #C26F7B;
+  --accent-fg: #1A1816;
+  --chip: #2E2A26;
+  --card-border: #3A352F;
+  --card-border-hover: #5A5249;
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--ink);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
 @layer base {
   html {
     font-family: 'Inter', system-ui, sans-serif;
@@ -20,3 +50,5 @@
 *::-webkit-scrollbar {
   display: none; /* Chrome / Safari / Edge */
 }
+
+.dark .shadow-sm { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); }

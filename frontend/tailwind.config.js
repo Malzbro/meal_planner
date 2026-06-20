@@ -11,15 +11,17 @@ export default {
     },
     extend: {
       colors: {
-        bg: "#FAFAF8",
-        ink: "#0F0F10",
-        muted: "#6F6F73",
-        line: "#E8E5DE",
+        bg: "var(--bg)",
+        ink: "var(--ink)",
+        muted: "var(--muted)",
+        line: "var(--line)",
         accent: {
-          DEFAULT: "#6B2737",
-          fg: "#FAFAF8",
+          DEFAULT: "var(--accent)",
+          fg: "var(--accent-fg)",
         },
-        chip: "#F1EDE5",
+        chip: "var(--chip)",
+        "card-border": "var(--card-border)",
+        "card-border-hover": "var(--card-border-hover)",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],

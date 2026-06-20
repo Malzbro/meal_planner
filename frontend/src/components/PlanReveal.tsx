@@ -31,7 +31,7 @@ export function PlanReveal({ plan, onComplete }: Props) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-white transition-opacity duration-700 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-bg transition-opacity duration-700 ${
         phase === 4 ? "opacity-0" : "opacity-100"
       }`}
     >

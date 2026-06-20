@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import type { PlannedMeal } from "@/lib/api"
 import { gbp } from "@/lib/utils"
+import { isDark } from "@/lib/theme"
+
 
 type Props = {
   meals: PlannedMeal[]
@@ -11,7 +13,7 @@ type Props = {
 // stays cohesive with the rest of the design language.
 // Curated 7-step palette spanning deep aubergine → dusty rose → warm clay.
 // Stays in the warm-burgundy family throughout — never green, blue, or orange.
-const SEGMENT_COLORS = [
+const LIGHT_SEGMENT_COLORS = [
   "#3F1521", // deepest plum (almost black-purple)
   "#5A1F2C", // dark aubergine
   "#751F33", // claret
@@ -21,10 +23,33 @@ const SEGMENT_COLORS = [
   "#D4A89F", // pale terracotta-blush
 ]
 
+// Dark-mode counterparts: shifted lighter and more saturated so they remain
+// visible on the warm near-black background. Same "personality" as light.
+const DARK_SEGMENT_COLORS = [
+  "#7A2837",
+  "#92344A",
+  "#A8425B",
+  "#BE5870",
+  "#D17588",
+  "#DF9AA8",
+  "#E8B9C4",
+]
+
+function usePalette() {
+  const [dark, setDark] = useState(() => isDark())
+  useEffect(() => {
+    const handler = () => setDark(isDark())
+    window.addEventListener("pantry-theme-change", handler)
+    return () => window.removeEventListener("pantry-theme-change", handler)
+  }, [])
+  return dark ? DARK_SEGMENT_COLORS : LIGHT_SEGMENT_COLORS
+}
+
 
 export function CostBreakdownBar({ meals, budget }: Props) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [animated, setAnimated] = useState(false)
+  const palette = usePalette()
 
   useEffect(() => {
     const t = setTimeout(() => setAnimated(true), 100)
@@ -61,7 +86,7 @@ export function CostBreakdownBar({ meals, budget }: Props) {
               className="transition-all ease-out cursor-pointer"
               style={{
                 width: `${widthPct}%`,
-                backgroundColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length],
+                backgroundColor: palette[i % palette.length],
                 opacity: isDimmed ? 0.4 : 1,
                 transitionDuration: animated ? "800ms" : "0ms",
                 transitionDelay: animated ? `${i * 50}ms` : "0ms",
