@@ -11,7 +11,7 @@ type Props = {
 
 const HEADLINE = "Your week is ready."
 
-export function PlanReveal({ plan, onComplete }: Props) {
+export function PlanReveal({onComplete }: Props) {
   const [phase, setPhase] = useState(1)
 
   useEffect(() => {
