@@ -172,17 +172,18 @@ The goal of this phase is to convert the engineering work into actual interviews
 
 After studying a polished competitor app (similar concept, "Herbia"-style branding), the best ideas to port into Pantry's web frontend without copying the visual aesthetic:
 
-- [x] **Multi-step onboarding flow** — replace the current single long form with 5–6 single-question screens (budget → vibe → dietary → appliances → preferences). Lower drop-off, more conversational, better mobile feel.
-- [x] **"Vibe" abstraction** — human categories ("Quick & Easy," "Healthy Comfort," "Fakeaway") that internally translate to combinations of existing filters and preference text. Real users don't think in `high_protein` flags.
-- [x] **Plan reveal celebration moment** — a small animated "your week is sorted" beat when the plan generates. Tiny but creates an emotional payoff.
-- [x] **Illustrated kitchen-appliances picker** — replace the text chips with a small illustrated kitchen scene. Warmer, more memorable.
-- [x] **Negation fix in swap (V2)** — extract excluded ingredients from the swap reason using LLM structured output, filter candidates by ingredient match in code, then run semantic search on the filtered pool. The "chat/preference loop" milestone from the original roadmap.
-- [ ] **Confidence-aware messaging** — when hybrid_search returns low similarity scores across all candidates, surface that to the user instead of pretending the top result is great.
-- [ ] **Each of these is its own commit and potentially its own short LinkedIn post** — compounding visibility on the same project.
-- [x] **Aggregated shopping list view** — sum ingredients across the week's recipes, scale by household size, group by ingredient category. The natural next user-facing feature (a meal plan is incomplete without a shopping list). Demonstrates data aggregation, unit normalisation, and a second API endpoint.
-- [x] **Stochastic diversity in planner** — replaced deterministic top-pick with softmax-weighted sampling over top-N candidates. Eliminates the "same plan every time" failure mode while preserving hard constraints and overall plan quality.
-- [x]**Unit-aware recipe schema and aggregation** — current schema stores all quantities in grams, leading to weight units being applied to liquids. A `unit` field per ingredient and corresponding aggregation logic would make the data unit-honest and unlock more accurate pricing.
+- [x] **Multi-step onboarding flow** — replaced single long form with 5-step wizard (budget → vibe → dietary → appliances → freeform). Sliding transitions between steps; calorie target hidden behind "advanced options" on Step 5.
+- [x] **"Vibe" abstraction** — eight human categories (Quick & Easy, Healthy Comfort, Fakeaway, Family Friendly, High Protein, Plant-Forward, World Food, Budget Stretch) that translate to preference text + dietary tags + cuisine bias entirely client-side; backend doesn't know vibes exist.
+- [x] **Plan reveal celebration moment** — V2 redesigned as a ~3-second deliberate sequence with a leaf bloom (SVG stroke animation), serif headline reveal, count-up numbers, and a settle beat. Makes the constraint-satisfaction feel earned.
 - [x] **Illustrated kitchen-appliances picker** — V1 shipped (icons on a counter scene). V2 refinement deferred: integrate icons into the background scene and add a pop-out animation on selection so picking feels physical.
+- [x] **Aggregated shopping list view** — backend endpoint that normalises, aggregates, scales, rounds, and categorises ingredients across the week's plan; frontend tab view with check-off interaction.
+- [x] **Stochastic diversity in planner** — replaced deterministic top-pick with softmax-weighted sampling over top-N candidates. Hard constraints remain deterministic.
+- [x] **Hand-built data visualisations** — cost breakdown bar (per-meal segments, sorted by cost, hover-isolate behaviour) and calorie distribution chart (vertical bars with dashed target reference line). No chart library.
+- [x] **Plan view restructured as a 4-card dashboard with bottom-sheet detail panels** — Budget, Shopping list, Pantry (placeholder), Stats. Cards remain visible; clicking raises a bottom sheet with details. Strengthened card outlines for more presence.
+- [x] **Recurring leaf motif as Pantry's identity element** — single ownable shape used in header, favicon, plan reveal, and stat separators. Restraint as identity.
+- [x] **Dark mode** — CSS custom properties for semantic colors (--bg, --ink, --accent, etc.) with light and dark counterparts; toggle button (top-right, sun/moon icon); persists to localStorage; respects OS preference on first visit.
+- [x] **Polish round** — favicon, cold-start "warming up" message on the plan button after 5s/12s, Open Graph meta tags for link previews, page title and description updated.
+- [ ] **Confidence-aware messaging** — when hybrid_search returns low similarity scores across all candidates, surface that to the user instead of pretending the top result is great.
 
 ### Phase C — Mobile app *(2–4 weeks, after Phases A and B)*
 
@@ -199,6 +200,25 @@ Once the web version is fully landed and a couple of cycles of feedback have bee
   Demonstrates state synchronization between two views and is the
   natural "next user-facing feature" after shopping list.
 
+### Phase D — Product validation *(decision point, after Phase B)*
+
+The project started as a CV piece but the polish work has brought it close to a state worth testing as a real product. Before continuing engineering, the most valuable next step is genuine user feedback.
+
+- [ ] **Get 10–20 real users to try the live demo** — friends, family, students at Nottingham, a small Reddit post on r/UKPersonalFinance or r/MealPrepSunday. The point is to find out whether there's actual demand before investing in product-grade infrastructure.
+- [ ] **Decide based on feedback:** if there's real interest, the product roadmap (below) becomes the priority; if not, return to portfolio mode and start the next CV project.
+
+### Phase F — Product-grade infrastructure *(only if Phase C signals demand)*
+Concrete gaps between "deployed demo" and "real product people pay for or rely on":
+
+- [ ] **Real grocery price integration** — Aldi/Lidl/Tesco pricing via aggregator APIs or a small price-scraping service. LLM-estimated prices are fine for a demo, not for a product. ~1–2 weeks.
+- [ ] **Real nutrition data** — USDA FoodData Central API (free, comprehensive) mapped to the ingredient table. ~3–4 days. Replaces LLM-estimated calories.
+- [ ] **Unit-aware recipe schema regeneration** — current `grams` field treats liquids incorrectly. Regenerate with `unit: g | ml | tbsp | tsp | whole`, update pricing prompts, add unit-aware aggregation. ~4–6 hours.
+- [ ] **Accounts and persistence** — Clerk or Supabase Auth, user profile, saved preferences, favourites, cooking history. Real product means state survives between sessions.
+- [ ] **PWA / mobile** — service worker, offline capability, installable, push notifications. Cheaper than native; the right call for a "use this in the supermarket" tool.
+- [ ] **Dataset expansion** — 373 recipes is enough for a demo; a product wants 2,000+ with proper categorisation. Recipe images are the hardest sub-problem.
+- [ ] **Stripe integration** — only relevant if a paid tier is planned.
+- [ ] **Differentiator positioning** — "AI meal planner" is saturated. Pantry's real differentiators are UK budget focus and constraint-satisfaction-first design (most competitors let you blow your budget). These need to live in the product positioning, not just the README.
+
 
 ## User-Discovered Issues (V2 candidates)
 
@@ -209,9 +229,9 @@ Issues found through dogfooding the app, prioritised but deferred for batched fu
 - **Unit unawareness for liquids** — open: ingredient quantities are all in grams; liquids should be ml. Frontend display workaround in place.
 - **Pantry-staple noise in shopping lists** — fixed (June 2026): water/salt/pepper were appearing on shopping lists; added a staple-name filter.
 - **Illustrated kitchen-appliances picker — refinement deferred:** initial implementation ships icons on a counter scene; the appliances feel slightly disconnected from the background. Planned V2: integrate appliances into the background as part of a single composed illustration, with a subtle "pop-out" / lift animation on selection so picking one feels physical rather than a state toggle.
+- **"Web app feels too plain" — addressed:** dogfooding revealed that despite functional polish, the app lacked a sense of place. Addressed via the recurring leaf motif (identity), the theatrical plan reveal (a real climax moment), card outlines for more presence, and the dark mode (which doubled as a sense of "real product" through a familiar app affordance). The combined effect made each screen feel like Pantry rather than a generic template.
 
-### Beyond — Other portfolio projects
-
+### Phase E - Other portfolio projects
 
 After Pantry has done its job, the natural next moves depend on which role types are showing interest:
 

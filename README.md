@@ -41,6 +41,14 @@ A few things I'd call attention to over the obvious "I used FastAPI" stuff:
 
 **Per-iteration budget-pressure reweighting in the planner.** Naive greedy selection by fitness fails on tight budgets — the algorithm picks expensive winners early, then can't fill the remaining slots. Pantry's planner recomputes fitness scores *every iteration* based on remaining budget per remaining meal, so cheap dishes become more attractive as budget tightens. This was an iteration on the V1 design after the eval suite caught the failure.
 
+**Visual identity via a single recurring motif.** Rather than over-decorating, Pantry uses one ownable visual element — a custom-drawn leaf — recurring across the header, favicon, plan reveal, and stat separators. Restraint as identity: the motif appears often enough to register, never loud enough to compete with content.
+
+**Dashboard with bottom-sheet detail panels.** The plan view organises into four glanceable summary cards (Budget, Shopping list, Pantry, Stats). Clicking a card raises a bottom sheet from below the viewport with the detailed view — same interaction metaphor as iOS sheets. Picks one interaction model and commits to it: the sheet *was summoned* by the click rather than just appearing, which gives the UI spatial logic instead of just appearing-and-disappearing panels.
+
+**Theatrical plan reveal.** The transition from "loading" to "your plan is ready" runs as a ~3-second deliberate sequence: a leaf blooms via SVG stroke animation, a serif headline reveals beside it, the budget/calorie/meal-count numbers count up from zero in monospace, and a caption settles in before the page transitions. The point is to make the constraint-satisfaction feel *earned* — the user sees the system solve their problem in front of them rather than just snapping to the result.
+
+**Theming via CSS custom properties.** Light and dark modes share a single set of semantic color variables (--bg, --ink, --accent, etc.) defined in `:root` and `:root.dark`. Tailwind reads these via `var()` instead of hardcoded hex, so a theme switch is a single class flip on `<html>` — no per-component dark variants, no theme provider library. Preference persists to localStorage and respects OS preference on first visit.
+
 **Automated eval harness with 5 quality properties.** The system isn't just shipped on vibes — there's a `python -m evals.run` command that runs 26 test cases against the planner and reports pass rates per property. Hard constraints pass at 100%; the soft calorie target passes at 88%, with failures concentrated on dataset-bound and candidate-pool-bound edge cases (see Evaluation section below).
 
 **UX abstraction layer over the planning API.** The frontend translates human concepts ("Fakeaway", "Plant-Forward", "Budget Stretch" — vibe categories real users think in) into the technical filters the backend expects (`preferred_cuisines`, `required_tags`, `preference_text`). The vibe-to-filter mapping lives entirely on the client; the backend doesn't know vibes exist. This is the right boundary — it lets the UX evolve (renaming vibes, adding new ones, A/B-testing copy) without touching the API contract, and it keeps the backend a pure constraint-satisfaction service.
@@ -100,7 +108,7 @@ Documented openly because pretending otherwise reads worse than the limitations 
 | Vector store | Chroma (local persistent) | No infra, file-based, good API at <100k vectors |
 | Embeddings | sentence-transformers MiniLM-L6-v2 | Local, free, 384-dim, good for sentence-level search |
 | LLM (generation) | Gemini 2.5 Flash + Groq Llama 3.3 70B (fallback) | Free tiers; fallback handles rate limits |
-| Frontend | React + Vite + TypeScript + Tailwind | Standard stack, fast iteration |
+| Frontend | React + Vite + TypeScript + Tailwind + tailwindcss-animate | Standard stack, fast iteration; CSS custom properties for theming |
 | Hosting | Vercel (frontend) + Railway (backend) | Free/cheap tiers, GitHub auto-deploy |
 
 ## Running locally
