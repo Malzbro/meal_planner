@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Leaf } from "@/components/Leaf"
-import { useCountUp } from "@/lib/useCountUp"
-import { gbp } from "@/lib/utils"
+//import { useCountUp } from "@/lib/useCountUp"
+//import { gbp } from "@/lib/utils"
 import type { PlanResponse } from "@/lib/api"
 
 type Props = {
@@ -25,13 +25,13 @@ export function PlanReveal({ plan, onComplete }: Props) {
   }, [onComplete])
 
   // Count-ups start as phase 2 begins (~600ms) and resolve well before the hold beat ends.
-  const cost = useCountUp(plan.total_cost_gbp, 1400, 1300)
-  const cal = useCountUp(Math.round(plan.avg_calories_per_serving), 1400, 1300)
-  const meals = useCountUp(plan.meals.length, 1400, 1300)
+  //const cost = useCountUp(plan.total_cost_gbp, 1400, 1300)
+  //const cal = useCountUp(Math.round(plan.avg_calories_per_serving), 1400, 1300)
+  //const meals = useCountUp(plan.meals.length, 1400, 1300)
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-bg/70 backdrop-blur-xl transition-opacity duration-700 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-white transition-opacity duration-700 ${
         phase === 4 ? "opacity-0" : "opacity-100"
       }`}
     >
@@ -61,13 +61,9 @@ export function PlanReveal({ plan, onComplete }: Props) {
       `}</style>
 
       <div className="flex items-center gap-8">
-        {/* Leaf: blooms in phase 1, shrinks + shifts left in phase 2+, pulses throughout */}
+        {/* Leaf: fades in, blooms, pulses — stays centered throughout */}
         <div
-          className="leaf-wrapper leaf-bloom text-accent"
-          style={{
-            ["--leaf-scale" as string]: phase === 1 ? "scale(1)" : "scale(0.9) translateX(-4px)",
-            transform: phase === 1 ? "scale(1)" : "scale(0.9) translateX(-4px)",
-          }}
+          className="leaf-wrapper leaf-bloom text-accent animate-in fade-in duration-700"
         >
           <Leaf className="w-20 h-20" />
         </div>
@@ -101,15 +97,6 @@ export function PlanReveal({ plan, onComplete }: Props) {
               transitionDelay: "1000ms",
             }}
           />
-
-          {phase >= 2 && (
-            <p
-              className="font-mono text-sm text-muted mt-3 animate-in fade-in duration-500"
-              style={{ animationDelay: "600ms", animationFillMode: "both" }}
-            >
-              {Math.round(meals)} meals · {gbp(Math.round(cost * 100) / 100)} · {Math.round(cal)} kcal avg
-            </p>
-          )}
 
           {phase >= 3 && (
             <p className="text-xs uppercase tracking-widest text-muted mt-6 animate-in fade-in duration-700">

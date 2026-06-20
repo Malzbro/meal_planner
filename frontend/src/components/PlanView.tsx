@@ -58,7 +58,7 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
     : ""
 
   return (
-    <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
+    <div className="max-w-4xl mx-auto animate-in fade-in duration-800">
       <div className="flex items-center justify-between mb-6">
         <button onClick={onReset} className="text-sm text-muted hover:text-ink transition-colors">
           ← Start over
