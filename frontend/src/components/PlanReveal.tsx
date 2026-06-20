@@ -19,7 +19,7 @@ export function PlanReveal({ plan, onComplete }: Props) {
       setTimeout(() => setPhase(2), 1200),  // longer anticipation
       setTimeout(() => setPhase(3), 2400),
       setTimeout(() => setPhase(4), 3800),
-      setTimeout(onComplete, 4500),
+      setTimeout(onComplete, 6000),
     ]
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
@@ -31,33 +31,43 @@ export function PlanReveal({ plan, onComplete }: Props) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-bg/85 backdrop-blur-sm transition-opacity duration-700 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-bg/70 backdrop-blur-xl transition-opacity duration-700 ${
         phase === 4 ? "opacity-0" : "opacity-100"
       }`}
     >
       <style>{`
-        @keyframes leafBloom {
-          from { stroke-dashoffset: 240; }
-          to   { stroke-dashoffset: 0; }
-        }
-        .leaf-bloom path {
-          fill: none;
-          stroke: currentColor;
-          stroke-width: 1.5;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-          stroke-dasharray: 240;
-          stroke-dashoffset: 240;
-          animation: leafBloom 1000ms ease-out forwards;
-        }
+          @keyframes leafBloom {
+            from { stroke-dashoffset: 240; }
+            to   { stroke-dashoffset: 0; }
+          }
+          @keyframes leafPulse {
+            0%, 100% { transform: var(--leaf-scale, scale(1)); }
+            50%      { transform: var(--leaf-scale, scale(1)) scale(1.04); }
+          }
+          .leaf-bloom path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 240;
+            stroke-dashoffset: 240;
+            animation: leafBloom 1000ms ease-out forwards;
+          }
+          .leaf-wrapper {
+            animation: leafPulse 2200ms ease-in-out infinite;
+            transition: --leaf-scale 700ms ease-out, transform 700ms ease-out;
+          }
       `}</style>
 
       <div className="flex items-center gap-8">
-        {/* Leaf: blooms in phase 1, shrinks + shifts left in phase 2+ */}
+        {/* Leaf: blooms in phase 1, shrinks + shifts left in phase 2+, pulses throughout */}
         <div
-          className={`leaf-bloom text-accent transition-transform duration-700 ease-out ${
-            phase === 1 ? "scale-100" : "scale-75 -translate-x-1"
-          }`}
+          className="leaf-wrapper leaf-bloom text-accent"
+          style={{
+            ["--leaf-scale" as string]: phase === 1 ? "scale(1)" : "scale(0.9) translateX(-4px)",
+            transform: phase === 1 ? "scale(1)" : "scale(0.9) translateX(-4px)",
+          }}
         >
           <Leaf className="w-20 h-20" />
         </div>
@@ -68,9 +78,6 @@ export function PlanReveal({ plan, onComplete }: Props) {
              Composing your week
            </p>
          )}
-        
-        
-
 
         {/* Text column: gated on phase >= 2 */}
         <div className="flex flex-col min-w-[18rem]">
