@@ -66,8 +66,6 @@ export default function App() {
           <PlanSkeleton />
         ) : !plan ? (
           <PlannerWizard onSubmit={handleSubmit} loading={loading} />
-        ) : showReveal ? (
-          <PlanReveal onComplete={() => setShowReveal(false)} />
         ) : (
           <PlanView
             plan={plan}
@@ -82,6 +80,9 @@ export default function App() {
           />
         )}
       </main>
+      {plan && showReveal && (
+        <PlanReveal plan={plan} onComplete={() => setShowReveal(false)} />
+      )}
 
       <RecipeModal
         recipeId={selectedRecipeId}
