@@ -13,3 +13,10 @@
     @apply bg-bg text-ink;
   }
 }
+
+* {
+  scrollbar-width: none; /* Firefox */
+}
+*::-webkit-scrollbar {
+  display: none; /* Chrome / Safari / Edge */
+}

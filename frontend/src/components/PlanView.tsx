@@ -5,7 +5,7 @@ import { useCountUp } from "@/lib/useCountUp"
 import { CostBreakdownBar } from "./CostBreakdownBar"
 import { CalorieDistribution } from "./CalorieDistribution"
 import { ShoppingListView } from "./ShoppingList"
-import { Leaf } from "./Leaf"
+import { Sheet } from "./Sheet"
 
 type Props = {
   plan: PlanResponse
@@ -21,7 +21,7 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
   const [active, setActive] = useState<ActiveCard>(null)
   const [barWidth, setBarWidth] = useState(0)
 
-  // Animate budget bar only when its panel is opened (was on mount before).
+  // Animate budget bar when the Budget sheet opens.
   useEffect(() => {
     if (active !== "budget") {
       setBarWidth(0)
@@ -45,11 +45,17 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
     .map(([c, n]) => `${c} × ${n}`)
     .join(", ")
 
-  const cardBase = "text-left p-5 border rounded-lg bg-bg transition-colors"
-  const activeBorder = "border-accent"
-  const inactiveBorder = "border-line hover:border-ink"
-  const mutedCard = "border-line opacity-60 cursor-not-allowed"
+  const cardLayout = "text-left p-5 rounded-lg bg-bg transition-all duration-200"
+  const cardActive = "border-2 border-accent shadow-md"
+  const cardInactive = "border-2 border-[#D9D3C7] shadow-sm hover:border-[#B0A893] hover:shadow-md"
+  const cardMuted = "border-2 border-[#D9D3C7] shadow-sm opacity-60 cursor-not-allowed"
   const eyebrow = "text-xs uppercase tracking-widest text-muted"
+
+  const sheetTitle =
+    active === "budget" ? "Budget"
+    : active === "shopping" ? "Shopping list"
+    : active === "stats" ? "Stats"
+    : ""
 
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
@@ -67,10 +73,10 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
       </div>
 
       {/* 2x2 dashboard */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
         <button
           onClick={() => setActive(active === "budget" ? null : "budget")}
-          className={`${cardBase} ${active === "budget" ? activeBorder : inactiveBorder}`}
+          className={`${cardLayout} ${active === "budget" ? cardActive : cardInactive}`}
         >
           <p className={eyebrow}>Budget</p>
           <p className="font-mono text-lg text-ink mt-2">
@@ -84,14 +90,14 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
 
         <button
           onClick={() => setActive(active === "shopping" ? null : "shopping")}
-          className={`${cardBase} ${active === "shopping" ? activeBorder : inactiveBorder}`}
+          className={`${cardLayout} ${active === "shopping" ? cardActive : cardInactive}`}
         >
           <p className={eyebrow}>Shopping list</p>
           <p className="font-mono text-lg text-ink mt-2">{plan.meals.length} recipes</p>
           <p className="text-sm text-muted mt-1">Tap to view ingredients</p>
         </button>
 
-        <div className={`${cardBase} ${mutedCard}`} aria-disabled="true">
+        <div className={`${cardLayout} ${cardMuted}`} aria-disabled="true">
           <p className={eyebrow}>Pantry</p>
           <p className="font-mono text-lg text-muted mt-2">Coming soon</p>
           <p className="text-sm text-muted mt-1">Track what you already have</p>
@@ -99,7 +105,7 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
 
         <button
           onClick={() => setActive(active === "stats" ? null : "stats")}
-          className={`${cardBase} ${active === "stats" ? activeBorder : inactiveBorder}`}
+          className={`${cardLayout} ${active === "stats" ? cardActive : cardInactive}`}
         >
           <p className={eyebrow}>Stats</p>
           <p className="font-mono text-lg text-ink mt-2">
@@ -108,60 +114,6 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
           <p className="text-sm text-muted mt-1">{plan.cuisine_diversity} cuisines</p>
         </button>
       </div>
-
-      {/* Expanded panel — keyed on `active` so switching re-runs the animate-in */}
-      {active && (
-        <div
-          key={active}
-          className="mb-10 p-6 border border-line rounded-lg bg-bg animate-in fade-in slide-in-from-top-2 duration-300"
-        >
-          {active === "budget" && (
-            <>
-              <div className="mb-6">
-                <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2">
-                  <span>Budget allocated</span>
-                  <span className="font-mono">
-                    {gbp(plan.total_cost_gbp)} / {gbp(plan.budget_gbp)}
-                  </span>
-                </div>
-                <div className="h-2 bg-chip rounded-sm overflow-hidden">
-                  <div
-                    className="h-full bg-accent transition-all ease-out"
-                    style={{
-                      width: `${barWidth}%`,
-                      transitionDuration: "1000ms",
-                      transitionDelay: "200ms",
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between text-xs text-muted mt-2 font-mono">
-                  <span>£0</span>
-                  <span>{pct}% used</span>
-                  <span>{gbp(plan.budget_gbp)}</span>
-                </div>
-              </div>
-              <CostBreakdownBar meals={plan.meals} budget={plan.budget_gbp} />
-            </>
-          )}
-
-          {active === "shopping" && (
-            <ShoppingListView
-              recipeIds={plan.meals.map(m => m.recipe_id)}
-              householdSize={householdSize}
-            />
-          )}
-
-          {active === "stats" && (
-            <div className="space-y-6">
-              <CalorieDistribution meals={plan.meals} target={Math.round(calorieTarget)} />
-              <div>
-                <p className={`${eyebrow} mb-2`}>Cuisine breakdown</p>
-                <p className="text-sm text-ink">{cuisineBreakdown}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       {plan.warnings.length > 0 && (
         <div className="mb-8 p-4 border border-line rounded-md bg-chip">
@@ -197,6 +149,59 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
           </button>
         ))}
       </div>
+
+      <Sheet
+        open={active !== null}
+        onClose={() => setActive(null)}
+        title={sheetTitle}
+        contentKey={active ?? "none"}
+      >
+        {active === "budget" && (
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between text-xs uppercase tracking-widest text-muted mb-2">
+                <span>Budget allocated</span>
+                <span className="font-mono">
+                  {gbp(plan.total_cost_gbp)} / {gbp(plan.budget_gbp)}
+                </span>
+              </div>
+              <div className="h-2 bg-chip rounded-sm overflow-hidden">
+                <div
+                  className="h-full bg-accent transition-all ease-out"
+                  style={{
+                    width: `${barWidth}%`,
+                    transitionDuration: "1000ms",
+                    transitionDelay: "200ms",
+                  }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-muted mt-2 font-mono">
+                <span>£0</span>
+                <span>{pct}% used</span>
+                <span>{gbp(plan.budget_gbp)}</span>
+              </div>
+            </div>
+            <CostBreakdownBar meals={plan.meals} budget={plan.budget_gbp} />
+          </div>
+        )}
+
+        {active === "shopping" && (
+          <ShoppingListView
+            recipeIds={plan.meals.map(m => m.recipe_id)}
+            householdSize={householdSize}
+          />
+        )}
+
+        {active === "stats" && (
+          <div className="space-y-6">
+            <CalorieDistribution meals={plan.meals} target={Math.round(calorieTarget)} />
+            <div>
+              <p className={`${eyebrow} mb-2`}>Cuisine breakdown</p>
+              <p className="text-sm text-ink">{cuisineBreakdown}</p>
+            </div>
+          </div>
+        )}
+      </Sheet>
     </div>
   )
 }
