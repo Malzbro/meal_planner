@@ -16,18 +16,18 @@ export function PlanReveal({ plan, onComplete }: Props) {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(2), 600),
-      setTimeout(() => setPhase(3), 1400),
-      setTimeout(() => setPhase(4), 2200),
-      setTimeout(onComplete, 3000),
+      setTimeout(() => setPhase(2), 1200),  // longer anticipation
+      setTimeout(() => setPhase(3), 2400),
+      setTimeout(() => setPhase(4), 3800),
+      setTimeout(onComplete, 4500),
     ]
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
 
   // Count-ups start as phase 2 begins (~600ms) and resolve well before the hold beat ends.
-  const cost = useCountUp(plan.total_cost_gbp, 1200, 700)
-  const cal = useCountUp(Math.round(plan.avg_calories_per_serving), 1200, 700)
-  const meals = useCountUp(plan.meals.length, 1200, 700)
+  const cost = useCountUp(plan.total_cost_gbp, 1400, 1300)
+  const cal = useCountUp(Math.round(plan.avg_calories_per_serving), 1400, 1300)
+  const meals = useCountUp(plan.meals.length, 1400, 1300)
 
   return (
     <div
@@ -48,7 +48,7 @@ export function PlanReveal({ plan, onComplete }: Props) {
           stroke-linejoin: round;
           stroke-dasharray: 240;
           stroke-dashoffset: 240;
-          animation: leafBloom 600ms ease-out forwards;
+          animation: leafBloom 1000ms ease-out forwards;
         }
       `}</style>
 
@@ -62,17 +62,27 @@ export function PlanReveal({ plan, onComplete }: Props) {
           <Leaf className="w-20 h-20" />
         </div>
 
+         {/* Anticipation hint — phase 1 only */}
+         {phase === 1 && (
+           <p className="absolute left-1/2 -translate-x-1/2 top-full mt-8 text-xs uppercase tracking-widest text-muted animate-pulse whitespace-nowrap">
+             Composing your week
+           </p>
+         )}
+        
+        
+
+
         {/* Text column: gated on phase >= 2 */}
         <div className="flex flex-col min-w-[18rem]">
-          <h1 className="font-display text-4xl text-ink leading-none min-h-[2.5rem]">
+          <h1 className="font-display text-4xl text-ink leading-none min-h-[2.5rem] flex gap-[0.25em] flex-wrap">
             {phase >= 2 &&
-              HEADLINE.split("").map((ch, i) => (
+              HEADLINE.split(" ").map((word, i) => (
                 <span
                   key={i}
                   className="inline-block animate-in fade-in slide-in-from-bottom-1 duration-500"
-                  style={{ animationDelay: `${i * 50}ms`, animationFillMode: "both" }}
+                  style={{ animationDelay: `${i * 120}ms`, animationFillMode: "both" }}
                 >
-                  {ch === " " ? "\u00A0" : ch}
+                  {word}
                 </span>
               ))}
           </h1>
@@ -86,8 +96,11 @@ export function PlanReveal({ plan, onComplete }: Props) {
           />
 
           {phase >= 2 && (
-            <p className="font-mono text-sm text-muted mt-3 animate-in fade-in duration-500" style={{ animationDelay: "600ms", animationFillMode: "both" }}>
-              {meals} meals · {gbp(cost)} · {cal} kcal avg
+            <p
+              className="font-mono text-sm text-muted mt-3 animate-in fade-in duration-500"
+              style={{ animationDelay: "600ms", animationFillMode: "both" }}
+            >
+              {Math.round(meals)} meals · {gbp(Math.round(cost * 100) / 100)} · {Math.round(cal)} kcal avg
             </p>
           )}
 
