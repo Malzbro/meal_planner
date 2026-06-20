@@ -7,10 +7,18 @@ type SheetProps = {
   title: string
   /** Used as a key for cross-fading content when switching between cards. */
   contentKey: string
+  width?: "narrow" | "wide"
   children: React.ReactNode
 }
 
-export function Sheet({ open, onClose, title, contentKey, children }: SheetProps) {
+export function Sheet({
+  open,
+  onClose,
+  title,
+  contentKey,
+  width = "narrow",
+  children,
+}: SheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null)
   const previouslyFocused = useRef<HTMLElement | null>(null)
 
@@ -24,20 +32,28 @@ export function Sheet({ open, onClose, title, contentKey, children }: SheetProps
   const [displayedTitle, setDisplayedTitle] = useState(title)
   const [contentVisible, setContentVisible] = useState(true)
 
+  // Latch the width while open so it doesn't snap during close
+  const [displayedWidth, setDisplayedWidth] = useState(width)
+
   useEffect(() => {
-   if (open) {
+    if (open) setDisplayedWidth(width)
+  }, [open, width])
+
+  useEffect(() => {
+    if (open) {
       previouslyFocused.current = document.activeElement as HTMLElement
       setMounted(true)
       let cancelled = false
+      // Double rAF so the browser paints the off-screen state before transitioning
       requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
           if (!cancelled) setVisible(true)
         })
       })
       return () => { cancelled = true }
     } else if (mounted) {
       setVisible(false)
-      const t = setTimeout(() => setMounted(false), 850)
+      const t = setTimeout(() => setMounted(false), 500)
       return () => clearTimeout(t)
     }
   }, [open])
@@ -127,54 +143,55 @@ export function Sheet({ open, onClose, title, contentKey, children }: SheetProps
       <div
         onClick={onClose}
         aria-hidden="true"
-        className="absolute inset-0 bg-ink transition-opacity ease-out"
+        className="absolute inset-0 bg-ink backdrop-blur-3xl transition-opacity ease-out"
         style={{
           opacity: visible ? 0.5 : 0,
-          transitionDuration: "550ms",
+          transitionDuration: "450ms",
         }}
       />
 
-        {/* Sheet — constrained to the page column, full border, lifted off bottom */}
-        <div className="absolute inset-x-0 bottom-4 sm:bottom-6 px-4 sm:px-6 pointer-events-none">
+      {/* Sheet — card-style, constrained to page column, lifted off bottom */}
+      <div className="absolute inset-x-0 bottom-4 sm:bottom-6 px-4 sm:px-6 pointer-events-none">
         <div
-            ref={sheetRef}
-            className="max-w-4xl mx-auto bg-bg rounded-2xl border-2 border-accent shadow-2xl flex flex-col pointer-events-auto"
-            style={{
-                height: "min(65vh, 720px)",
-                maxHeight: "85vh",
-                transform: visible ? "translateY(0)" : "translateY(110%)",
-                transition: visible
-                    ? "transform 800ms cubic-bezier(0.16, 1, 0.3, 1)"
-                    : "transform 500ms cubic-bezier(0.4, 0, 1, 1)",
-            }}
+          ref={sheetRef}
+          className={`mx-auto bg-bg rounded-2xl border-2 border-accent shadow-2xl flex flex-col pointer-events-auto transition-[max-width] duration-300 ease-out ${
+            displayedWidth === "wide" ? "max-w-3xl" : "max-w-md"
+          }`}
+          style={{
+            height: "min(65vh, 720px)",
+            maxHeight: "85vh",
+            transform: visible ? "translateY(0)" : "translateY(110%)",
+            transition: visible
+              ? "transform 550ms cubic-bezier(0.16, 1, 0.3, 1), max-width 300ms ease-out"
+              : "transform 450ms cubic-bezier(0.4, 0, 1, 1), max-width 300ms ease-out",
+          }}
         >
-            <div className="px-6 pt-3 pb-4 border-b border-line">
-            <div className="flex justify-center mb-3">
-                <div className="w-10 h-1 rounded-full bg-line" aria-hidden="true" />
-            </div>
+          {/* Sticky header */}
+          <div className="px-6 pt-3 pb-4 border-b border-line">
             <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-widest text-muted">{displayedTitle}</span>
-                <button
+              <span className="text-xs uppercase tracking-widest text-muted">{displayedTitle}</span>
+              <button
                 onClick={onClose}
                 aria-label="Close panel"
                 className="text-muted hover:text-ink transition-colors p-1 -mr-1 rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
-                >
+              >
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M5 5L15 15M15 5L5 15" />
+                  <path d="M5 5L15 15M15 5L5 15" />
                 </svg>
-                </button>
+              </button>
             </div>
-            </div>
+          </div>
 
-            <div className="flex-1 overflow-y-auto">
+          {/* Body — scrolls independently, cross-fades on contentKey change */}
+          <div className="flex-1 overflow-y-auto">
             <div
-                className="px-6 py-6 transition-opacity"
-                style={{
-                opacity: contentVisible ? 1 : 0,
-                transitionDuration: "800ms",
-                }}
+              className="px-6 py-6 transition-opacity"
+              style={{
+                opacity: visible && contentVisible ? 1 : 0,
+                transitionDuration: "200ms",
+              }}
             >
-                {displayedChildren}
+              {displayedChildren}
             </div>
           </div>
         </div>

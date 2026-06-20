@@ -155,6 +155,7 @@ export function PlanView({ plan, calorieTarget, householdSize, onSelectMeal, onR
         onClose={() => setActive(null)}
         title={sheetTitle}
         contentKey={active ?? "none"}
+        width={active === "shopping" ? "wide" : "narrow"}
       >
         {active === "budget" && (
           <div className="space-y-6">
